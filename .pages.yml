@@ -37,7 +37,7 @@ content:
             - name: Swiss Cotton Skirt
               label: Swiss Cotton Skirt
       - name: price
-        label: Selling Price in Taka
+        label: Base Price in Taka (each colour may override)
         type: number
         required: true
         description: Enter a number like 650, not ৳650.
@@ -45,8 +45,55 @@ content:
         label: Previous Price (optional)
         type: number
         description: Only enter if a genuine previous selling price applies.
+      - name: variants
+        label: Colours and Photo Galleries
+        type: object
+        description: Add each available colour here. Every colour gets its own listing, photos, price override and stock switch.
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{color} — {id}"
+        fields:
+          - name: id
+            label: Colour Product Code (unique)
+            type: string
+            required: true
+            description: Example FIA-SCP-BLK. Keep it stable; customers use it when ordering.
+          - name: color
+            label: Colour Name
+            type: string
+            required: true
+            description: Example Black, White or Dusty Rose.
+          - name: hex
+            label: Swatch Colour (HEX, optional)
+            type: string
+            description: Example #292929 for black, #FFFFFF for white, #813B4A for maroon.
+          - name: images
+            label: Photos for THIS Colour
+            type: image
+            options:
+              multiple:
+                max: 10
+              unique: true
+              extensions: [jpg, jpeg, png, webp]
+          - name: price
+            label: Colour-Specific Price (optional)
+            type: number
+            description: Leave empty to use the main product price.
+          - name: oldPrice
+            label: Previous Price for THIS Colour (optional)
+            type: number
+          - name: description
+            label: Colour-Specific Description (optional)
+            type: text
+          - name: inStock
+            label: This Colour In Stock
+            type: boolean
+          - name: featured
+            label: Feature This Colour
+            type: boolean
       - name: images
-        label: Product Photographs
+        label: Default Photos (for products with no colour entries)
         type: image
         options:
           multiple:
@@ -66,7 +113,7 @@ content:
         label: Waist / Adjustable Tie
         type: string
       - name: colours
-        label: Colours Available
+        label: Legacy Colours Description (optional)
         type: string
         description: Example Black, White, Rose/Maroon.
       - name: design
