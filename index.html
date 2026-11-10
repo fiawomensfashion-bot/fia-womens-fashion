@@ -474,7 +474,7 @@
 
     // Photos are resized by Netlify Image CDN when the site is online.
     // When the file is opened locally, the original file is used instead.
-    var useCdn = location.protocol.indexOf("http") === 0 && !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+    var useCdn = false;
     function originalSrc(file) { return "images/" + String(file).split("/").map(encodeURIComponent).join("/"); }
     function cdnSrc(file, w) {
       return "/.netlify/images?url=" + encodeURIComponent("/" + originalSrc(file)) + "&w=" + w + "&fm=webp&q=78";
