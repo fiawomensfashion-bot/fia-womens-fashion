@@ -25,7 +25,7 @@ const SETTINGS = {
   // Your Facebook Page username, the part after facebook.com/
   // Example: if your page is facebook.com/fia.fashion, write "fia.fashion".
   // The order buttons open https://m.me/<this username>
-  messengerPage: "MY_FACEBOOK_PAGE_USERNAME",
+  messengerPage: "fiawomensfashion",
 
   // Colour theme for the whole site. Choose one: "rose", "peach" or "mauve".
   theme: "rose",
