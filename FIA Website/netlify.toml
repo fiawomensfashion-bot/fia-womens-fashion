@@ -1,0 +1,5 @@
+# Use this only with the original static HTML website source at repo root.
+# Netlify builds products.js from Pages CMS JSON on every GitHub update.
+[build]
+  command = "node scripts/build-catalogue.mjs"
+  publish = "."
