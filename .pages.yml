@@ -1,0 +1,133 @@
+# FIA catalogue editor for https://app.pagescms.org/
+# This edits JSON data. Netlify runs scripts/build-catalogue.mjs
+# to generate the products.js expected by your existing index.html.
+media:
+  input: images
+  output: /images
+  rename: safe
+  categories: [image]
+
+content:
+  - name: products
+    label: FIA Products
+    type: file
+    path: data/products.json
+    format: json
+    list: true
+    fields:
+      - name: id
+        label: Product Code (unique)
+        type: string
+        required: true
+        description: Example FIA-SCP-BLK-01. Do not reuse codes.
+      - name: name
+        label: Product Name
+        type: string
+        required: true
+      - name: category
+        label: Collection
+        type: select
+        required: true
+        options:
+          values:
+            - name: Linen Palazzo
+              label: Linen Palazzo
+            - name: Swiss Cotton Palazzo
+              label: Swiss Cotton Palazzo
+            - name: Swiss Cotton Skirt
+              label: Swiss Cotton Skirt
+      - name: price
+        label: Selling Price in Taka
+        type: number
+        required: true
+        description: Enter a number like 650, not ৳650.
+      - name: oldPrice
+        label: Previous Price (optional)
+        type: number
+        description: Only enter if a genuine previous selling price applies.
+      - name: images
+        label: Product Photographs
+        type: image
+        options:
+          multiple:
+            max: 8
+          unique: true
+          extensions: [jpg, jpeg, png, webp]
+      - name: description
+        label: Product Description
+        type: text
+      - name: fabric
+        label: Fabric
+        type: string
+      - name: size
+        label: Size / Measurements
+        type: string
+      - name: waist
+        label: Waist / Adjustable Tie
+        type: string
+      - name: colours
+        label: Colours Available
+        type: string
+        description: Example Black, White, Rose/Maroon.
+      - name: design
+        label: Design Details
+        type: string
+        description: Example Gathered skirt, front buttons.
+      - name: care
+        label: Care Instructions
+        type: string
+      - name: inStock
+        label: In Stock (enables order button)
+        type: boolean
+      - name: featured
+        label: Featured (show near top)
+        type: boolean
+
+  - name: offers
+    label: FIA Offers & Guarantees
+    type: file
+    path: data/offers.json
+    format: json
+    list: true
+    fields:
+      - name: title
+        label: Offer Title
+        type: string
+        required: true
+      - name: text
+        label: Offer Details / Terms
+        type: text
+      - name: badge
+        label: Offer Badge
+        type: string
+      - name: ends
+        label: Offer End Date (optional; YYYY-MM-DD)
+        type: string
+
+  - name: settings
+    label: FIA Shop Settings
+    type: file
+    path: data/settings.json
+    format: json
+    fields:
+      - name: shopName
+        label: Shop Name
+        type: string
+      - name: tagline
+        label: Home Page Tagline
+        type: text
+      - name: messengerPage
+        label: Facebook Page Username (NOT the entire URL)
+        type: string
+        description: Verify the username by opening https://m.me/USERNAME.
+      - name: theme
+        label: Website Colour Theme
+        type: select
+        options:
+          values: [rose, peach, mauve]
+      - name: currency
+        label: Currency Symbol
+        type: string
+      - name: footerNote
+        label: Footer Message
+        type: text
