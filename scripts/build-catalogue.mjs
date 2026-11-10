@@ -1,6 +1,7 @@
-// Build the products.js consumed by FIA's EXISTING index.html.
-// Runs automatically at Netlify build time after Pages CMS edits JSON.
-// Also usable locally: node scripts/build-catalogue.mjs
+// FIA Catalogue Builder — colour-variant edition.
+// Pages CMS edits data/*.json. Netlify runs this command before publishing.
+// New products can contain a `variants` list; each variant becomes an individual
+// catalogue card while retaining a shared group for colour switching.
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -9,59 +10,108 @@ const read = (file) => JSON.parse(fs.readFileSync(path.join(base, 'data', file),
 const settings = read('settings.json');
 const offers = read('offers.json');
 const records = read('products.json');
-if (!Array.isArray(records) || !Array.isArray(offers) || !settings || Array.isArray(settings)) {
-  throw new Error('Expected data/products.json and data/offers.json to be arrays and data/settings.json to be an object.');
+if (!Array.isArray(records) || !Array.isArray(offers) || !settings || typeof settings !== 'object' || Array.isArray(settings)) {
+  throw new Error('Expected products.json and offers.json to be arrays, and settings.json to be an object.');
 }
 
+const categories = new Set(['Linen Palazzo', 'Swiss Cotton Palazzo', 'Swiss Cotton Skirt']);
+const usedIds = new Set();
+const products = [];
+const asText = (value) => String(value ?? '').trim();
+const validPrice = (value) => value !== undefined && value !== null && value !== '' && Number.isFinite(Number(value)) && Number(value) > 0;
 const cleanImage = (image) => {
   if (typeof image !== 'string') return null;
   const s = image.trim();
-  // Pages CMS returns /images/file.jpg; existing site expects file.jpg.
-  if (s.startsWith('https:') || s.startsWith('http:')) return null;
+  if (!s || /^https?:|^data:|^\/\//i.test(s)) return null;
   const stripped = s.replace(/^\/?images\//, '').replace(/^\/+/, '');
-  if (!stripped || stripped.split('/').includes('..')) return null;
+  if (!stripped || stripped.split('/').some(part => part === '..' || part === '.' || part === '')) return null;
   return stripped;
 };
-const categories = new Set(['Linen Palazzo', 'Swiss Cotton Palazzo', 'Swiss Cotton Skirt']);
-const seen = new Set();
-const products = [];
-for (const item of records) {
-  if (!item || typeof item !== 'object') continue;
-  const id = String(item.id ?? '').trim();
-  const name = String(item.name ?? '').trim();
-  const category = String(item.category ?? '').trim();
-  const price = Number(item.price);
-  if (!id || !name || !categories.has(category) || !Number.isFinite(price) || price <= 0) {
-    console.warn(`Skipping incomplete product ${JSON.stringify(id || name)}: code, name, collection and positive price are required.`);
+const imageList = (value) => (Array.isArray(value) ? value : value ? [value] : []).map(cleanImage).filter(Boolean);
+const optionalOld = (value, price) => validPrice(value) && Number(value) > price ? Number(value) : null;
+const addProduct = (p) => {
+  if (usedIds.has(p.id)) throw new Error(`Duplicate product/colour code: ${p.id}`);
+  usedIds.add(p.id);
+  products.push(p);
+};
+
+for (const parent of records) {
+  if (!parent || typeof parent !== 'object') continue;
+  const id = asText(parent.id);
+  const name = asText(parent.name);
+  const category = asText(parent.category);
+  if (!id || !name || !categories.has(category)) {
+    console.warn(`Skipping product ${JSON.stringify(id || name)}: needs an ID, name and FIA collection.`);
     continue;
   }
-  if (seen.has(id)) throw new Error(`Duplicate product code: ${id}`);
-  seen.add(id);
-  const details = {};
-  for (const [key, label] of [['fabric', 'Fabric'], ['size', 'Size'], ['waist', 'Waist'], ['colours', 'Colours'], ['design', 'Design'], ['care', 'Care']]) {
-    if (typeof item[key] === 'string' && item[key].trim()) details[label] = item[key].trim();
+  const basePrice = validPrice(parent.price) ? Number(parent.price) : null;
+  const baseImages = imageList(parent.images);
+  const baseDetails = {};
+  for (const [key, label] of [['fabric','Fabric'], ['size','Size'], ['waist','Waist'], ['design','Design'], ['care','Care']]) {
+    if (asText(parent[key])) baseDetails[label] = asText(parent[key]);
   }
-  const images = (Array.isArray(item.images) ? item.images : item.images ? [item.images] : [])
-    .map(cleanImage).filter(Boolean);
-  const old = Number(item.oldPrice);
-  products.push({
-    id, name, category, price,
-    oldPrice: Number.isFinite(old) && old > price ? old : null,
-    images,
-    description: String(item.description ?? ''),
-    details,
-    inStock: item.inStock === true,
-    featured: item.featured === true
-  });
+  const variants = Array.isArray(parent.variants) ? parent.variants : [];
+
+  if (variants.length) {
+    for (const v of variants) {
+      if (!v || typeof v !== 'object') continue;
+      const variantId = asText(v.id);
+      const colour = asText(v.color);
+      const price = validPrice(v.price) ? Number(v.price) : basePrice;
+      if (!variantId || !colour || price === null) {
+        console.warn(`Skipping colour ${JSON.stringify(colour)} for ${id}: requires unique code, colour and a valid price.`);
+        continue;
+      }
+      const oldVal = validPrice(v.oldPrice) ? v.oldPrice : parent.oldPrice;
+      const swatch = /^#[0-9a-f]{6}$/i.test(asText(v.hex)) ? asText(v.hex) : '';
+      addProduct({
+        id: variantId,
+        groupId: id,
+        groupName: name,
+        variantColor: colour,
+        variantHex: swatch,
+        name: `${name} — ${colour}`,
+        category,
+        price,
+        oldPrice: optionalOld(oldVal, price),
+        images: imageList(v.images).length ? imageList(v.images) : baseImages,
+        description: asText(v.description) || asText(parent.description),
+        details: { ...baseDetails, Colour: colour },
+        inStock: v.inStock === true,
+        featured: v.featured === true || parent.featured === true
+      });
+    }
+  } else {
+    // Compatibility with existing Pages CMS entries that have no colours yet.
+    if (basePrice === null) {
+      console.warn(`Skipping product ${id}: price must be positive.`);
+      continue;
+    }
+    const details = { ...baseDetails };
+    if (asText(parent.colours)) details.Colours = asText(parent.colours);
+    addProduct({
+      id, name, category,
+      groupId: id,
+      groupName: name,
+      variantColor: '',
+      variantHex: '',
+      price: basePrice,
+      oldPrice: optionalOld(parent.oldPrice, basePrice),
+      images: baseImages,
+      description: asText(parent.description),
+      details,
+      inStock: parent.inStock === true,
+      featured: parent.featured === true
+    });
+  }
 }
 
-// Existing index.html reads these top-level const declarations synchronously.
 const output = [
-  '/* GENERATED FILE — edit FIA data through Pages CMS; do not edit this file manually. */',
+  '/* GENERATED BY FIA BUILD SCRIPT — edit products in Pages CMS, not in this file. */',
   `const SETTINGS = ${JSON.stringify(settings, null, 2)};`,
   `const OFFERS = ${JSON.stringify(offers, null, 2)};`,
   `const PRODUCTS = ${JSON.stringify(products, null, 2)};`,
   ''
 ].join('\n');
 fs.writeFileSync(path.join(base, 'products.js'), output, 'utf8');
-console.log(`Generated products.js with ${products.length} product(s), ${offers.length} offer(s).`);
+console.log(`Generated products.js: ${records.length} design(s), ${products.length} displayed colour listing(s), ${offers.length} offer(s).`);
