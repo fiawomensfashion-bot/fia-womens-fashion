@@ -1,21 +1,5 @@
-# Fia catalogue: a plain static site with no build step.
+# Use this only with the original static HTML website source at repo root.
+# Netlify builds products.js from Pages CMS JSON on every GitHub update.
 [build]
+  command = "node scripts/build-catalogue.mjs"
   publish = "."
-  command = ""
-
-# Always check for a fresh products.js and index.html, so new products show up right after a redeploy.
-[[headers]]
-  for = "/products.js"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-[[headers]]
-  for = "/index.html"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
