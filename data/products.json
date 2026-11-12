@@ -1,0 +1,382 @@
+[
+  {
+    "id": "FIA-LP-DBL",
+    "name": "FIA Linen Palazzo",
+    "category": "Linen Palazzo",
+    "price": null,
+    "oldPrice": null,
+    "mainColor": "Dusty Blue",
+    "mainHex": "#587B99",
+    "images": [
+      "/images/Linen Plazo/Blue Linen Palazzo Pants Poster_clean-compresso.webp",
+      "/images/Linen Plazo/Gemini_Generated_Image_ftjhirftjhirftjh_clean-compresso.webp"
+    ],
+    "variants": [
+      {
+        "id": "FIA-LP-01-RED",
+        "color": "Red",
+        "hex": "#C9223A",
+        "images": [
+          "/images/Linen Plazo/Bright Red Palazzo Pants Look-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_nbh1zonbh1zonbh1_clean-compresso.webp",
+          "/images/Linen Plazo/Red Linen Palazzo Poster_clean-compresso.webp",
+          "/images/Linen Plazo/Sunlit Style in Red Palazzos-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-MAV",
+        "color": "Mauve",
+        "hex": "#965176",
+        "images": [
+          "/images/Linen Plazo/Casual Palazzo Style by Sunlight-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_1xdv9d1xdv9d1xdv_clean-compresso.webp",
+          "/images/Linen Plazo/Mauve Linen Palazzo Fashion Poster_clean-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-ASH",
+        "color": "Ash Grey",
+        "hex": "#92919A",
+        "images": [
+          "/images/Linen Plazo/Flowy Linen Palazzo Fashion Poster (1)_clean-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_wjzaylwjzaylwjza_clean-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-BLK",
+        "color": "Black",
+        "hex": "#272428",
+        "images": [
+          "/images/Linen Plazo/Flowy Linen Palazzo Fashion Poster (2)_clean-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_jnzbpsjnzbpsjnzb_clean-compresso.webp",
+          "/images/Linen Plazo/Sunlit Courtyard Palazzo Style-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-ORG",
+        "color": "Orange",
+        "hex": "#E76B2E",
+        "images": [
+          "/images/Linen Plazo/Flowy Linen Palazzo Fashion Poster_clean-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_5zj295zj295zj295_clean-compresso.webp",
+          "/images/Linen Plazo/Vibrant Orange Pants Courtyard Look-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-MUS",
+        "color": "Mustard Yellow",
+        "hex": "#DFAE24",
+        "images": [
+          "/images/Linen Plazo/Flowy Linen Palazzo Pants (1)_clean-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_6euway6euway6euw_clean-compresso.webp",
+          "/images/Linen Plazo/Mustard Palazzo Pants Fashion Collage-compresso.webp",
+          "/images/Linen Plazo/Sunlit Fashion Portrait with Yellow Palazzo Pants-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-IVR",
+        "color": "Ivory",
+        "hex": "#EEE7D8",
+        "images": [
+          "/images/Linen Plazo/Flowy Linen Palazzo Pants Poster_clean-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_a0zd5sa0zd5sa0zd_clean-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-PUR",
+        "color": "Purple",
+        "hex": "#71398F",
+        "images": [
+          "/images/Linen Plazo/Flowy Purple Linen Palazzo Ad_clean-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-WHT",
+        "color": "White",
+        "hex": "#F7F7F3",
+        "images": [
+          "/images/Linen Plazo/Flowy White Linen Palazzo Pants_clean-compresso.webp",
+          "/images/Linen Plazo/Minimalist Courtyard Fashion Portrait-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-TUR",
+        "color": "Turquoise",
+        "hex": "#159FBE",
+        "images": [
+          "/images/Linen Plazo/Gemini_Generated_Image_3bsbog3bsbog3bsb_clean-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_oew2zboew2zboew2_clean-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_tr4r02tr4r02tr4r_clean-compresso.webp",
+          "/images/Linen Plazo/Sunlit Casual Style on a Wooden Bench-compresso.webp",
+          "/images/Linen Plazo/Teal Linen Palazzo Fashion Poster_clean-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-BRY",
+        "color": "Berry",
+        "hex": "#B33367",
+        "images": [
+          "/images/Linen Plazo/Gemini_Generated_Image_4vr9jv4vr9jv4vr9_clean-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-HPK",
+        "color": "Hot Pink",
+        "hex": "#E94887",
+        "images": [
+          "/images/Linen Plazo/Gemini_Generated_Image_5jjln75jjln75jjl_clean-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_ucx4zsucx4zsucx4_clean-compresso.webp",
+          "/images/Linen Plazo/Sunlit Minimalist Pink Pants Portrait-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-NVY",
+        "color": "Navy Blue",
+        "hex": "#343C7E",
+        "images": [
+          "/images/Linen Plazo/Gemini_Generated_Image_6p3yma6p3yma6p3y_clean-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_7fyoec7fyoec7fyo_clean-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-PCH",
+        "color": "Peach",
+        "hex": "#EEB18C",
+        "images": [
+          "/images/Linen Plazo/Gemini_Generated_Image_a447pla447pla447_clean-compresso.webp",
+          "/images/Linen Plazo/Peach Linen Palazzo Pants Ad_clean-compresso.webp",
+          "/images/Linen Plazo/Sunlit Peach Palazzo Portrait-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-RBL",
+        "color": "Royal Blue",
+        "hex": "#315AB6",
+        "images": [
+          "/images/Linen Plazo/Gemini_Generated_Image_co1t3aco1t3aco1t_clean-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_i183pti183pti183_clean-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-DTL",
+        "color": "Dark Teal",
+        "hex": "#245A59",
+        "images": [
+          "/images/Linen Plazo/Gemini_Generated_Image_kqr73tkqr73tkqr7_clean-compresso.webp",
+          "/images/Linen Plazo/Teal Linen Palazzo Pants Advertisement_clean-compresso.webp",
+          "/images/Linen Plazo/Warm Sunlit Teal Palazzo Fashion Pose-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-BRG",
+        "color": "Burgundy",
+        "hex": "#75283B",
+        "images": [
+          "/images/Linen Plazo/Gemini_Generated_Image_ov3dczov3dczov3d_clean-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-BRN",
+        "color": "Brown",
+        "hex": "#784538",
+        "images": [
+          "/images/Linen Plazo/Gemini_Generated_Image_ruk931ruk931ruk9_clean-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-BPK",
+        "color": "Blush Pink",
+        "hex": "#E8A5BE",
+        "images": [
+          "/images/Linen Plazo/Gemini_Generated_Image_tzl68stzl68stzl6_clean-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_xrhq6zxrhq6zxrhq_clean-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "featured": false
+      }
+    ],
+    "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+    "fabric": "Linen (please confirm fabric composition)",
+    "size": "Free size — ask for exact measurements",
+    "waist": "Ask for waistband measurements",
+    "design": "Relaxed palazzo silhouette",
+    "featured": false
+  },
+  {
+    "id": "FIA-SP-01",
+    "name": "FIA Swiss Cotton Palazzo",
+    "category": "Swiss Cotton Palazzo",
+    "price": 400,
+    "oldPrice": 500,
+    "mainColor": "Olive",
+    "mainHex": "#899A55",
+    "images": [
+      "/images/Swiss Cotton Plazo/Dreamy Earth-Toned Studio Portrait-4_clean-compresso.webp",
+      "/images/Swiss Cotton Plazo/Dreamy Studio Portrait on a Woven Mat-2_clean-compresso.webp",
+      "/images/Swiss Cotton Plazo/Flowy Olive Palazzo Pants Poster_clean-compresso.webp",
+      "/images/Swiss Cotton Plazo/Flowy Palazzo_ Timeless Comfort_clean-compresso.webp",
+      "/images/Swiss Cotton Plazo/Relaxed Studio Portrait with Sage Tones-1_clean-compresso.webp",
+      "/images/Swiss Cotton Plazo/fia_olive_bold_9x16_clean-compresso.webp",
+      "/images/Swiss Cotton Plazo/fia_olive_casual_9x16_clean-compresso.webp",
+      "/images/Swiss Cotton Plazo/fia_olive_sitting_9x16_clean-compresso.webp"
+    ],
+    "variants": [
+      {
+        "id": "FIA-SP-02",
+        "color": "Black",
+        "hex": "#272428",
+        "images": [
+          "/images/Swiss Cotton Plazo/Black Palazzo Pants Style Lookbook-3_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/Flowy Palazzo Fashion Ad (1)_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/Flowy Palazzo Pants Advertisement_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/fia_black_palazzo_bold_walking_9x16_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/fia_black_palazzo_sitting_9x16_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/fia_black_palazzo_standing_9x16_clean-compresso.webp"
+        ],
+        "description": "FIA's Swiss Cotton Palazzo is designed for everyday comfort and versatile styling. Features an elastic waistband and an adjustable matching-fabric tie. Free-size design; please message FIA for exact measurements before ordering. Browse each colour's own photographs and confirm current availability through Messenger.",
+        "featured": false,
+        "price": 400,
+        "oldPrice": 500,
+        "inStock": true
+      },
+      {
+        "id": "FIA-SP-03",
+        "color": "White",
+        "hex": "#F7F7F3",
+        "images": [
+          "/images/Swiss Cotton Plazo/Airy All-White Wide-Leg Look-3_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/Airy Studio Style with Tote and Plant-2_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/Confident White Outfit Studio Portrait_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/Elegant Flowy Palazzo Pants Advertisement_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/Flowy Palazzo Fashion Poster_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/Flowy White Palazzo Essentials-3_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/Minimalist White Fashion Portrait-1_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/Minimalist White Outfit in Sunlit Studio-4_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/White Palazzo Pants Style Collage-1_clean-compresso.webp"
+        ],
+        "description": "FIA's Swiss Cotton Palazzo is designed for everyday comfort and versatile styling. Features an elastic waistband and an adjustable matching-fabric tie. Free-size design; please message FIA for exact measurements before ordering. Browse each colour's own photographs and confirm current availability through Messenger.",
+        "featured": false,
+        "price": 400,
+        "oldPrice": 500,
+        "inStock": true
+      },
+      {
+        "id": "FIA-SP-03-MAR",
+        "color": "Burgundy",
+        "hex": "#75283B",
+        "images": [
+          "/images/Swiss Cotton Plazo/Burgundy Palazzo Pants Fashion Ad_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/Burgundy Palazzo Pants in Minimalist Light_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/Confident Burgundy Palazzo Portrait_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/Maroon Palazzo Fashion Poster_clean-compresso.webp",
+          "/images/Swiss Cotton Plazo/Relaxed Burgundy Palazzo Portrait_clean-compresso.webp"
+        ],
+        "description": "FIA's Swiss Cotton Palazzo is designed for everyday comfort and versatile styling. Features an elastic waistband and an adjustable matching-fabric tie. Free-size design; please message FIA for exact measurements before ordering. Browse each colour's own photographs and confirm current availability through Messenger.",
+        "featured": false,
+        "price": 400,
+        "oldPrice": 500,
+        "inStock": true
+      }
+    ],
+    "description": "FIA's Swiss Cotton Palazzo is designed for everyday comfort and versatile styling. Features an elastic waistband and an adjustable matching-fabric tie. Free-size design; please message FIA for exact measurements before ordering. Browse each colour's own photographs and confirm current availability through Messenger.",
+    "fabric": "Swiss cotton",
+    "size": "Free size — ask for exact measurements",
+    "waist": "Elastic waistband with matching-fabric tie",
+    "design": "Relaxed palazzo silhouette",
+    "featured": true,
+    "inStock": true
+  },
+  {
+    "id": "FIA-SK-01",
+    "name": "FIA Swiss Cotton Skirt",
+    "category": "Swiss Cotton Skirt",
+    "price": null,
+    "oldPrice": null,
+    "mainColor": "Black",
+    "mainHex": "#272428",
+    "images": [
+      "/images/Swiss Cotton Skirt/ChatGPT Image Nov 7, 2026, 07_04_32 AM-2_clean-compresso.webp",
+      "/images/Swiss Cotton Skirt/ChatGPT Image Nov 7, 2026, 07_04_33 AM-3_clean-compresso.webp",
+      "/images/Swiss Cotton Skirt/ChatGPT Image Nov 7, 2026, 07_04_34 AM-4_clean-compresso.webp",
+      "/images/Swiss Cotton Skirt/ChatGPT Image Nov 7, 2026, 07_04_34 AM-5_clean-compresso.webp",
+      "/images/Swiss Cotton Skirt/ChatGPT Image Nov 7, 2026, 07_04_35 AM-6_clean-compresso.webp",
+      "/images/Swiss Cotton Skirt/Flowy Swiss Cotton Skirt Advertisement-compresso.webp"
+    ],
+    "variants": [
+      {
+        "id": "FIA-SK-01-ROS",
+        "color": "Rose",
+        "hex": "#C35E76",
+        "images": [
+          "/images/Swiss Cotton Skirt/Warm Editorial Skirt Fashion Ad-compresso.webp",
+          "/images/Swiss Cotton Skirt/fia_rose_skirt_bold_pose_9x16_clean-compresso.webp",
+          "/images/Swiss Cotton Skirt/fia_rose_skirt_sitting_casual_9x16_clean-compresso.webp",
+          "/images/Swiss Cotton Skirt/fia_rose_skirt_sitting_reading_9x16_clean-compresso.webp",
+          "/images/Swiss Cotton Skirt/fia_rose_skirt_standing_classic_9x16_clean-compresso.webp",
+          "/images/Swiss Cotton Skirt/fia_rose_skirt_standing_movement_9x16_clean-compresso.webp",
+          "/images/Swiss Cotton Skirt/fia_rose_skirt_standing_relaxed_9x16_clean-compresso.webp"
+        ],
+        "description": "A flowing Swiss cotton skirt for everyday outfits and easy styling. Choose your preferred colour from the linked photo galleries. Free-size design; please request exact measurements, current price and availability through Messenger before ordering.",
+        "featured": false
+      },
+      {
+        "id": "FIA-SK-01-WHT",
+        "color": "White",
+        "hex": "#F7F7F3",
+        "images": [
+          "/images/Swiss Cotton Skirt/Flowy Skirt Boutique Advertisement-compresso.webp",
+          "/images/Swiss Cotton Skirt/fia_white_skirt_bold_pose_9x16_clean-compresso.webp",
+          "/images/Swiss Cotton Skirt/fia_white_skirt_sitting_reading_9x16_clean-compresso.webp",
+          "/images/Swiss Cotton Skirt/fia_white_skirt_sitting_relaxed_9x16_clean-compresso.webp",
+          "/images/Swiss Cotton Skirt/fia_white_skirt_standing_classic_9x16_clean-compresso.webp",
+          "/images/Swiss Cotton Skirt/fia_white_skirt_standing_movement_9x16_clean-compresso.webp",
+          "/images/Swiss Cotton Skirt/fia_white_skirt_standing_relaxed_9x16_clean-compresso.webp"
+        ],
+        "description": "A flowing Swiss cotton skirt for everyday outfits and easy styling. Choose your preferred colour from the linked photo galleries. Free-size design; please request exact measurements, current price and availability through Messenger before ordering.",
+        "featured": false
+      }
+    ],
+    "description": "A flowing Swiss cotton skirt for everyday outfits and easy styling. Choose your preferred colour from the linked photo galleries. Free-size design; please request exact measurements, current price and availability through Messenger before ordering.",
+    "fabric": "Swiss cotton",
+    "size": "Free size — ask for exact measurements",
+    "waist": "Ask for waistband measurements",
+    "design": "Flowing skirt",
+    "featured": false
+  }
+]
