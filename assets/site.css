@@ -433,3 +433,19 @@
 .enquiry-preview { margin-top: .8rem; border-top: 1px solid var(--border); padding-top: .65rem; }
 .enquiry-preview summary { color: var(--accent-ink); cursor: pointer; font-weight: 800; text-align: center; }
 .enquiry-preview p { padding: .75rem; background: var(--card); border-radius: var(--radius-sm); font-size: .92rem; line-height: 1.6; text-align: left; overflow-wrap: anywhere; }
+
+/* FIA small update notice. Does not interrupt product navigation or enquiries. */
+.fia-update-notice {
+  position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  max-width:780px;margin-inline:auto;padding:12px 15px;
+  background:#fff;color:#312126;border:1px solid #d4a4ae;
+  border-radius:14px;box-shadow:0 12px 30px #200e1430;
+  font:600 0.95rem/1.4 system-ui,sans-serif;
+}
+.fia-update-notice span{flex:1 1 235px}
+.fia-update-notice button{cursor:pointer;min-height:42px;border:0;border-radius:9px;
+  background:#933a53;color:#fff;padding:8px 14px;font:700 0.92rem system-ui,sans-serif}
+.fia-update-notice button.fia-update-dismiss{background:#f2e7ea;color:#442734}
+.fia-update-notice button:focus-visible{outline:3px solid #713246;outline-offset:2px}
+@media (max-width:540px){.fia-update-notice{gap:8px}.fia-update-notice span{flex-basis:100%}}

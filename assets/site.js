@@ -753,4 +753,69 @@
     window.addEventListener('popstate', route);
     window.addEventListener("hashchange", route);
     route();
+
+    /* ---------- Non-disruptive catalogue version check ---------- */
+    // A customer can leave FIA open for hours. Check lightly when their tab
+    // becomes visible, and periodically while shopping. Never refresh a page
+    // without asking: an automatic reload could interrupt a WhatsApp enquiry.
+    (function watchForNewCatalogue() {
+      var tag = document.querySelector('meta[name="fia-build-version"]');
+      var runningVersion = tag && tag.getAttribute('content');
+      if (!runningVersion || !window.fetch) return;
+      var lastChecked = 0, pending = false, offered = false;
+      function showUpdateNotice() {
+        if (offered) return;
+        offered = true;
+        var banner = document.createElement('aside');
+        banner.className = 'fia-update-notice';
+        banner.setAttribute('role', 'status');
+        banner.setAttribute('aria-label', 'Website update available');
+        var message = document.createElement('span');
+        message.textContent = 'New FIA products, prices or website updates are available.';
+        var refresh = document.createElement('button');
+        refresh.type = 'button';
+        refresh.textContent = 'Show updates';
+        refresh.addEventListener('click', function () {
+          // Force a distinct document URL for any visitor with a stale legacy
+          // HTML cache. The URL fragment retains the selected product/colour.
+          var url = new URL(location.href);
+          url.searchParams.set('fia_update', String(Date.now()));
+          location.replace(url.href);
+        });
+        var dismiss = document.createElement('button');
+        dismiss.type = 'button';
+        dismiss.className = 'fia-update-dismiss';
+        dismiss.textContent = 'Later';
+        dismiss.setAttribute('aria-label', 'Dismiss update notice');
+        dismiss.addEventListener('click', function () { banner.remove(); });
+        banner.appendChild(message);
+        banner.appendChild(refresh);
+        banner.appendChild(dismiss);
+        document.body.appendChild(banner);
+      }
+      function checkVersion(force) {
+        if (pending || offered || document.hidden) return;
+        var now = Date.now();
+        if (!force && now - lastChecked < 120000) return;
+        lastChecked = now;
+        pending = true;
+        fetch('/site-version.json', {cache:'no-store', credentials:'same-origin'})
+          .then(function (response) { if (!response.ok) throw new Error('Status unavailable'); return response.json(); })
+          .then(function (status) {
+            if (status && typeof status.version === 'string' && status.version !== runningVersion)
+              showUpdateNotice();
+          })
+          .catch(function () { /* offline visitors can keep browsing */ })
+          .finally(function () { pending = false; });
+      }
+      // Avoid a startup request for each shopper: new navigations already
+      // fetch current HTML and fingerprinted assets. A check runs after 5 min.
+      window.setInterval(function () { checkVersion(false); }, 300000);
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) checkVersion(false);
+      });
+      window.addEventListener('pageshow', function (e) {
+        if (e.persisted) checkVersion(true); // browser back-forward cache
+      });
+    })();
   })();
