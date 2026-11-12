@@ -1,5 +1,5 @@
 # FIA catalogue editor for https://app.pagescms.org/
-# This edits JSON data. Netlify runs scripts/build-catalogue.mjs
+# This edits JSON data. Host build runs scripts/build-catalogue.mjs
 # to generate the products.js expected by your existing index.html.
 media:
   input: images
@@ -39,8 +39,7 @@ content:
       - name: price
         label: Base Price in Taka (each colour may override)
         type: number
-        required: true
-        description: Enter a number like 650, not ৳650.
+        description: Enter verified price in taka, or leave empty to show Ask for price.
       - name: oldPrice
         label: Previous Price (optional)
         type: number
@@ -95,7 +94,7 @@ content:
             label: Colour-Specific Description (optional)
             type: text
           - name: inStock
-            label: This Colour In Stock
+            label: This Colour In Stock (leave unset if unconfirmed)
             type: boolean
           - name: featured
             label: Feature This Colour
@@ -132,7 +131,7 @@ content:
         label: Care Instructions
         type: string
       - name: inStock
-        label: In Stock (enables order button)
+        label: In Stock (leave unset if unconfirmed)
         type: boolean
       - name: featured
         label: Featured (show near top)
@@ -176,9 +175,9 @@ content:
         type: string
         description: Verify the username by opening https://m.me/USERNAME.
       - name: whatsappNumber
-        label: FIA WhatsApp Business Number
+        label: FIA WhatsApp Business Number (international digits only)
         type: string
-        description: Enter your WhatsApp number with country code. Example 88017XXXXXXXX. No + sign or spaces.
+        description: Example for Bangladesh 8801XXXXXXXXX. No plus sign, spaces, or leading zero. WhatsApp becomes primary ordering channel when entered; otherwise Messenger stays enabled.
       - name: theme
         label: Website Colour Theme
         type: select
@@ -189,4 +188,61 @@ content:
         type: string
       - name: footerNote
         label: Footer Message
+        type: text
+      - name: logo
+        label: Official FIA Logo Image (optional)
+        type: image
+        options:
+          extensions: [png, jpg, jpeg, webp, svg]
+
+  - name: shop-info
+    label: FIA Store Pages & Policies
+    type: file
+    path: data/site-info.json
+    format: json
+    fields:
+      - name: about
+        label: About FIA
+        type: text
+      - name: delivery
+        label: Delivery & COD Information
+        type: text
+      - name: returns
+        label: Returns and Replacement Information
+        type: text
+      - name: sizeIntro
+        label: Size Guide Introduction
+        type: text
+      - name: privacy
+        label: Privacy Information
+        type: text
+      - name: customerCare
+        label: Contact / Customer Care
+        type: text
+
+  - name: size-guide
+    label: FIA Verified Size Chart
+    type: file
+    path: data/sizes.json
+    format: json
+    list: true
+    fields:
+      - name: collection
+        label: Collection
+        type: string
+        required: true
+      - name: waistMin
+        label: Waist Minimum (inches, verified only)
+        type: number
+      - name: waistMax
+        label: Waist Maximum (inches, verified only)
+        type: number
+      - name: length
+        label: Garment Length (inches)
+        type: number
+      - name: hemFlat
+        label: Hem Width Flat (inches)
+        type: number
+      - name: notes
+        label: Notes
         type: text
