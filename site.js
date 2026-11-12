@@ -9,10 +9,13 @@
       page: S.messengerPage || "",
       theme: S.theme || "rose",
       currency: S.currency || "৳",
-      footer: S.footerNote || ""
+      footer: S.footerNote || "",
+      logo: typeof S.logo === "string" && /^\/images\/[\w \.\-\/]+$/i.test(S.logo) ? S.logo : ""
     };
     var offersData = (typeof OFFERS !== "undefined" && Array.isArray(OFFERS)) ? OFFERS : [];
     var rawProducts = (typeof PRODUCTS !== "undefined" && Array.isArray(PRODUCTS)) ? PRODUCTS : [];
+    var shopInfo = (typeof SHOP_INFO !== "undefined" && SHOP_INFO) || {};
+    var sizeGuide = (typeof SIZE_GUIDE !== "undefined" && Array.isArray(SIZE_GUIDE)) ? SIZE_GUIDE : [];
 
     // Keep only valid products, then put featured ones first (otherwise keep file order).
     var products = rawProducts
@@ -39,7 +42,7 @@
     function slug(text) {
       return String(text).toLowerCase().trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "") || "other";
     }
-    function num(v) { var n = Number(v); return isFinite(n) ? n : null; }
+    function num(v) { if (v === null || v === undefined || v === "") return null; var n = Number(v); return isFinite(n) ? n : null; }
     function money(v) {
       var n = num(v);
       if (n === null) return "";
@@ -51,10 +54,11 @@
     }
     function percentOff(p) { return Math.round((1 - num(p.price) / num(p.oldPrice)) * 100); }
     function inStock(p) { return p.inStock !== false; }
+    function unknownStock(p) { return p.inStock !== true && p.inStock !== false; }
     function firstLetter(name) { var s = String(name || "?").trim(); return (Array.from(s)[0] || "?").toUpperCase(); }
     function messengerUrl() { return "https://m.me/" + encodeURIComponent(shop.page); }
     function orderMessage(p) {
-      return "Hi " + shop.name + ", I would like to order: " + p.name + " (Code " + p.id + ", " + money(p.price) + ")";
+      return "Hi " + shop.name + ", I am interested in " + p.name + " (Code " + p.id + ")" + (num(p.price) !== null ? ", listed at " + money(p.price) : "") + ". Please confirm the price, measurements, availability and delivery charge.";
     }
     function imagesOf(p) { return Array.isArray(p.images) ? p.images.filter(Boolean) : []; }
 
@@ -141,16 +145,17 @@
     function badges(p) {
       var out = [];
       if (!inStock(p)) out.push('<span class="tag tag-dark">Sold out</span>');
+      else if (unknownStock(p)) out.push('<span class="tag tag-gold">Confirm availability</span>');
       if (hasDiscount(p)) out.push('<span class="tag tag-accent">' + percentOff(p) + "% off</span>");
       if (p.featured) out.push('<span class="tag tag-gold">Featured</span>');
       return out.length ? '<div class="badges">' + out.join("") + "</div>" : "";
     }
     function priceRow(p) {
-      return '<div class="price-row"><span class="price">' + esc(money(p.price)) + "</span>" +
+      return '<div class="price-row"><span class="price">' + esc(num(p.price) === null ? 'Ask for price' : money(p.price)) + "</span>" +
         (hasDiscount(p) ? '<span class="old-price"><span class="sr-only">Was </span>' + esc(money(p.oldPrice)) + "</span>" : "") + "</div>";
     }
     function orderButton(p, compact) {
-      var label = compact ? "Order" : "Order on Messenger";
+      var label = unknownStock(p) ? (compact ? "Enquire" : "Ask on Messenger") : compact ? "Order" : "Order on Messenger";
       if (!inStock(p)) {
         return '<button class="btn btn-primary btn-block" type="button" disabled>Sold out</button>';
       }
@@ -158,7 +163,7 @@
         ' data-id="' + esc(p.id) + '" aria-label="Order ' + esc(p.name) + ' on Messenger (opens in a new tab)">' +
         icons.messenger + "<span>" + label + "</span></a>";
     }
-    function productUrl(p) { return "#/product/" + encodeURIComponent(p.id); }
+    function productUrl(p) { return "/p/" + encodeURIComponent(p.id) + "/"; }
     // All colour entries of a design stay linked, even though every colour
     // also has its own card and unique product link in the collection feed.
     function variantsOf(p) {
@@ -223,9 +228,9 @@
     }
 
     function tabs(active) {
-      var all = '<a href="#/"' + (active ? "" : ' aria-current="page"') + '>All<span class="count">' + products.length + "</span></a>";
+      var all = '<a href="/#/"' + (active ? "" : ' aria-current="page"') + '>All<span class="count">' + products.length + "</span></a>";
       return '<nav class="tabs" aria-label="Categories">' + all + categories.map(function (c) {
-        return '<a href="#/category/' + encodeURIComponent(c.slug) + '"' + (active === c.slug ? ' aria-current="page"' : "") + ">" +
+        return '<a href="/#/category/' + encodeURIComponent(c.slug) + '"' + (active === c.slug ? ' aria-current="page"' : "") + ">" +
           esc(c.name) + '<span class="count">' + c.count + "</span></a>";
       }).join("") + "</nav>";
     }
@@ -263,10 +268,18 @@
       var note = document.getElementById("result-note");
       if (note) note.textContent = q ? list.length + (list.length === 1 ? " product" : " products") + " found for “" + searchTerm.trim() + "”" : "";
       var visible = list.slice(0, visibleLimit);
-      grid.innerHTML = list.length ? visible.map(card).join("") :
+      var viewKey = (activeCat || '') + '|' + q;
+      var append = grid.dataset.viewKey === viewKey && Number(grid.dataset.count || 0) > 0 && Number(grid.dataset.count) < visible.length;
+      if (append) {
+        grid.insertAdjacentHTML('beforeend', visible.slice(Number(grid.dataset.count)).map(card).join(''));
+      } else if (list.length) {
+        grid.innerHTML = visible.map(card).join('');
+      } else grid.innerHTML =
         '<div class="empty" style="grid-column: 1 / -1"><h3>' + (q ? "No matches yet" : "Coming soon") + "</h3><p>" +
         (q ? "Try a different word, or send us a message — we may have it in store." : "New pieces are on their way. Check back soon!") +
         '</p><a class="btn btn-ghost" href="' + esc(messengerUrl()) + '" target="_blank" rel="noopener">' + icons.messenger + "Ask on Messenger</a></div>";
+      grid.dataset.viewKey = viewKey;
+      grid.dataset.count = String(visible.length);
       var area = document.getElementById("load-more-area");
       var status = document.getElementById("load-more-status");
       if (area) area.hidden = !(list.length > visible.length);
@@ -276,7 +289,13 @@
     function bindSearch(activeCat) {
       var input = document.getElementById("q");
       if (!input) return;
-      input.addEventListener("input", function () { searchTerm = input.value; visibleLimit = pageSize; renderGrid(activeCat); });
+      var searchTimer;
+      input.addEventListener("input", function () {
+        searchTerm = input.value;
+        visibleLimit = pageSize;
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function () { renderGrid(activeCat); }, 140);
+      });
       var more = document.getElementById("load-more");
       if (more) more.addEventListener("click", function () { visibleLimit += pageSize; renderGrid(activeCat); more.focus(); });
       input.addEventListener("keydown", function (e) { if (e.key === "Enter") input.blur(); });
@@ -302,7 +321,7 @@
     function viewCategory(s) {
       var name = catName(s);
       if (!name) return viewNotFound("We couldn't find that category.");
-      return '<div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="#/">Home</a><span aria-hidden="true">/</span><span>' + esc(name) + "</span></nav>" +
+      return '<div class="wrap"><nav class="crumbs" aria-label="Breadcrumb"><a href="/#/">Home</a><span aria-hidden="true">/</span><span>' + esc(name) + "</span></nav>" +
         '<h1 class="page-title">' + esc(name) + "</h1></div>" +
         catalogueSection(s, "");
     }
@@ -317,7 +336,7 @@
 
       var gallery = '<div class="gallery">' +
         '<div class="gallery-main" id="gallery-main">' + badges(p) +
-          (imgs.length ? imgTag(imgs[0], p, 1000, { eager: true, sizes: "(min-width: 880px) 560px, 100vw" }) : placeholder(p)) + "</div>" +
+          (imgs.length ? imgTag(imgs[0], p, 1000, { eager: true, sizes: "(min-width: 880px) 560px, 100vw" }) + '<button type="button" class="zoom-trigger" id="zoom-trigger" aria-label="Enlarge product photograph">⊕ Zoom</button>' : placeholder(p)) + "</div>" +
         (imgs.length > 1 ? '<div class="thumbs" role="group" aria-label="Choose a photo">' + imgs.map(function (f, i) {
           return '<button type="button" class="thumb" data-index="' + i + '"' + (i === 0 ? ' aria-current="true"' : "") +
             ' aria-label="Show photo ' + (i + 1) + " of " + imgs.length + '">' + imgTag(f, p, 200, { alt: "", sizes: "76px" }) + "</button>";
@@ -325,16 +344,17 @@
       "</div>";
 
       var info = '<div class="info">' +
-        '<span class="card-cat"><a href="#/category/' + encodeURIComponent(c) + '">' + esc(catName(c)) + "</a></span>" +
+        '<span class="card-cat"><a href="/#/category/' + encodeURIComponent(c) + '">' + esc(catName(c)) + "</a></span>" +
         "<h1>" + esc(p.name) + "</h1>" +
         '<span class="code">Product code: <b>' + esc(p.id) + "</b></span>" +
         priceRow(p) +
         (hasDiscount(p) ? '<span class="tag tag-accent">' + percentOff(p) + "% off · You save " + esc(money(num(p.oldPrice) - num(p.price))) + "</span>" : "") +
-        '<div><span class="stock' + (inStock(p) ? "" : " out") + '">' + (inStock(p) ? "In stock" : "Sold out") + "</span></div>" +
+        '<div><span class="stock' + (inStock(p) ? "" : " out") + '">' + (unknownStock(p) ? "Availability: please confirm" : inStock(p) ? "In stock" : "Sold out") + "</span></div>" +
         colourPicker(p, false) +
+        '<button class="share-link" type="button" data-copy-link="' + esc(productUrl(p)) + '">Copy link to this colour</button>' +
         (p.description ? '<p class="desc">' + esc(p.description) + "</p>" : '<div class="desc"></div>') +
         '<div class="order-box">' + orderButton(p, false) +
-          "<p>" + (inStock(p) ? "Tap to open Messenger — your order message is copied, ready to paste." : "This piece is sold out. Message us to ask about restocks.") + "</p>" +
+          "<p>" + (inStock(p) ? "Open Messenger — your enquiry is copied, ready to paste." : "This piece is sold out. Message us to ask about restocks.") + "</p>" +
         "</div>" +
         (details.length ? '<div class="details"><h2>Details</h2><dl>' + details.map(function (k) {
           return '<div class="row"><dt>' + esc(k) + "</dt><dd>" + esc(p.details[k]) + "</dd></div>";
@@ -342,18 +362,50 @@
       "</div>";
 
       return '<div class="wrap">' +
-          '<nav class="crumbs" aria-label="Breadcrumb"><a href="#/">Home</a><span aria-hidden="true">/</span>' +
-          '<a href="#/category/' + encodeURIComponent(c) + '">' + esc(catName(c)) + '</a><span aria-hidden="true">/</span><span>' + esc(p.name) + "</span></nav>" +
+          '<nav class="crumbs" aria-label="Breadcrumb"><a href="/#/">Home</a><span aria-hidden="true">/</span>' +
+          '<a href="/#/category/' + encodeURIComponent(c) + '">' + esc(catName(c)) + '</a><span aria-hidden="true">/</span><span>' + esc(p.name) + "</span></nav>" +
           '<article class="product">' + gallery + info + "</article>" +
         "</div>" +
         (more.length ? '<section aria-labelledby="more-title"><div class="wrap">' +
-          '<div class="section-head"><h2 id="more-title">More in ' + esc(catName(c)) + '</h2><a class="back-link" href="#/category/' + encodeURIComponent(c) + '">See all</a></div>' +
+          '<div class="section-head"><h2 id="more-title">More in ' + esc(catName(c)) + '</h2><a class="back-link" href="/#/category/' + encodeURIComponent(c) + '">See all</a></div>' +
           '<div class="more-row">' + more.map(card).join("") + "</div></div></section>" : "");
     }
 
     function viewNotFound(msg) {
       return '<div class="wrap" style="padding-top:2rem"><div class="empty"><h3>Oops, nothing here</h3><p>' + esc(msg) +
-        '</p><a class="btn btn-primary" href="#/">Back to the shop</a></div></div>';
+        '</p><a class="btn btn-primary" href="/#/">Back to the shop</a></div></div>';
+    }
+
+    /* ---------- Store information pages ---------- */
+    function infoView(key) {
+      var pages = {
+        about: ["About FIA", "about"], delivery: ["Delivery & Cash on Delivery", "delivery"],
+        returns: ["Returns & Replacements", "returns"], privacy: ["Privacy", "privacy"]
+      };
+      var title = pages[key] && pages[key][0];
+      if (key === 'size-guide') {
+        var tableRows = sizeGuide.map(function (x) {
+          function measure(n) { var value = num(n); return value === null ? 'Ask FIA' : String(value) + ' in'; }
+          var waist = num(x.waistMin) !== null && num(x.waistMax) !== null ? measure(x.waistMin) + '–' + measure(x.waistMax) : 'Ask FIA';
+          return '<tr><th scope="row">' + esc(x.collection) + '</th><td>' + esc(waist) + '</td><td>' + esc(measure(x.length)) + '</td><td>' + esc(measure(x.hemFlat)) + '</td></tr>' +
+            (x.notes ? '<tr class="size-notes"><td colspan="4">' + esc(x.notes) + '</td></tr>' : '');
+        }).join('');
+        return '<div class="wrap info-page"><nav class="crumbs"><a href="/#/">Home</a> / Size Guide</nav><h1>Size Guide</h1>' +
+          '<p>' + esc(shopInfo.sizeIntro || 'Please ask FIA for verified measurements before ordering.') + '</p>' +
+          '<div class="table-scroll"><table class="size-table"><thead><tr><th>Collection</th><th>Waist range</th><th>Length</th><th>Hem flat</th></tr></thead><tbody>' + tableRows + '</tbody></table></div>' +
+          '<p>Values marked “Ask FIA” have not yet been measured and should not be guessed.</p>' + careButton() + '</div>';
+      }
+      if (!title) return viewNotFound('This page does not exist.');
+      var message = String(shopInfo[pages[key][1]] || 'Details are being prepared. Please contact FIA to confirm.');
+      return '<div class="wrap info-page"><nav class="crumbs"><a href="/#/">Home</a> / ' + esc(title) + '</nav><h1>' + esc(title) + '</h1>' +
+        '<div class="information-copy">' + esc(message).replace(/\n/g,'<br>') + '</div>' + careButton() + '</div>';
+    }
+    function careButton() { return '<p class="info-contact"><a class="btn btn-primary" target="_blank" rel="noopener" href="' + esc(messengerUrl()) + '">Ask FIA on Messenger</a></p>'; }
+    function activeProductId() {
+      var hashMatch = /^#\/product\/([^/]+)/.exec(location.hash);
+      var pathMatch = /^\/p\/([^/]+)\/?$/.exec(location.pathname);
+      var raw = hashMatch ? hashMatch[1] : pathMatch ? pathMatch[1] : '';
+      try { return decodeURIComponent(raw); } catch (_) { return raw; }
     }
 
     /* ---------- Router ---------- */
@@ -362,6 +414,12 @@
 
     function route() {
       var hash = location.hash.replace(/^#\/?/, "");
+      if (!hash) {
+        var pagePath = /^\/(about|delivery|returns|size-guide|privacy)\/?$/.exec(location.pathname);
+        if (pagePath) hash = "info/" + pagePath[1];
+        var pathProductId = activeProductId();
+        if (pathProductId) hash = "product/" + encodeURIComponent(pathProductId);
+      }
       var parts = hash.split("/").map(function (x) { try { return decodeURIComponent(x); } catch (e) { return x; } });
       var html, title = shop.name + " — Women's Fashion & Accessories", activeCat = null, scrollTo = null;
 
@@ -369,6 +427,9 @@
         html = viewProduct(parts[1]);
         var p = products.filter(function (x) { return String(x.id) === parts[1]; })[0];
         if (p) title = p.name + " — " + shop.name;
+      } else if (parts[0] === "info" && parts[1]) {
+        html = infoView(parts[1]);
+        title = parts[1].replace(/-/g, ' ') + " — " + shop.name;
       } else if (parts[0] === "category" && parts[1]) {
         activeCat = parts[1];
         html = viewCategory(activeCat);
@@ -407,7 +468,7 @@
       var main = document.getElementById("gallery-main");
       var thumbs = document.querySelectorAll(".thumb");
       if (!main || !thumbs.length) return;
-      var id = decodeURIComponent(location.hash.split("/")[2] || "");
+      var id = activeProductId();
       var p = products.filter(function (x) { return String(x.id) === id; })[0];
       if (!p) return;
       var imgs = imagesOf(p);
@@ -423,6 +484,28 @@
         });
       });
     }
+
+    // Click to zoom product photographs. Dialog closes with Escape or its button.
+    var zoomDialog = document.getElementById('photo-zoom');
+    document.addEventListener('click', function (e) {
+      if (e.target.closest && e.target.closest('#zoom-close')) { zoomDialog.close(); return; }
+      if (e.target === zoomDialog) { zoomDialog.close(); return; }
+      if (!(e.target.closest && e.target.closest('#zoom-trigger'))) return;
+      var product = products.find(function (x) { return x.id === activeProductId(); });
+      var photo = document.querySelector('#gallery-main img');
+      if (!product || !photo || !zoomDialog || !zoomDialog.showModal) return;
+      var source = photo.currentSrc || photo.src;
+      var zoomImg = document.getElementById('zoom-image');
+      zoomImg.src = source;
+      zoomImg.alt = photo.alt || product.name;
+      zoomDialog.showModal();
+    });
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest && e.target.closest('[data-copy-link]');
+      if (!btn) return;
+      var link = location.origin + btn.dataset.copyLink;
+      copyNow(link).then(function () { showToast('<span>Product link copied.</span>'); }, function () { showToast('<span>Copy this link: <code>' + esc(link) + '</code></span>', 9000); });
+    });
 
     /* ---------- Order on Messenger: copy message + open m.me ---------- */
     var toast = document.getElementById("toast");
@@ -483,20 +566,42 @@
 
     /* ---------- Static header & footer ---------- */
     var logo = document.getElementById("logo");
-    logo.innerHTML = esc(shop.name) + '<span class="dot">.</span>';
+    logo.innerHTML = shop.logo ? '<img class="brand-logo" src="' + esc(shop.logo) + '" alt="' + esc(shop.name) + '">' : esc(shop.name) + '<span class="dot">.</span>';
     logo.setAttribute("aria-label", shop.name + " — home");
+    if (shop.logo) {
+      var favicon = document.querySelector('link[rel="icon"]');
+      if (favicon) favicon.href = shop.logo;
+    }
     document.getElementById("header-msg").href = messengerUrl();
     document.getElementById("footer").innerHTML =
-      '<a class="logo" href="#/">' + esc(shop.name) + '<span class="dot">.</span></a>' +
+      '<a class="logo" href="/#/">' + esc(shop.name) + '<span class="dot">.</span></a>' +
       (shop.footer ? "<p>" + esc(shop.footer) + "</p>" : "") +
+      '<nav class="footer-links" aria-label="Shop information">' +
+      '<a href="/about/">About FIA</a><a href="/delivery/">Delivery</a><a href="/returns/">Returns & Replacements</a>' +
+      '<a href="/size-guide/">Size Guide</a><a href="/privacy/">Privacy</a></nav>' +
       '<a class="btn btn-ghost" href="' + esc(messengerUrl()) + '" target="_blank" rel="noopener">' + icons.messenger + "Chat with us on Messenger</a>" +
       "<small>© " + new Date().getFullYear() + " " + esc(shop.name) + ". All prices in Bangladeshi Taka (" + esc(shop.currency) + ").</small>";
 
     if (!activeOffers().length) {
-      var offersLink = document.querySelector('.header-nav a[href="#/offers"]');
+      var offersLink = document.querySelector('.header-nav a[href="/#/offers"]');
       if (offersLink) offersLink.remove();
     }
 
+    // Same-origin SPA navigation: switching products/colours avoids a full page reload.
+    document.addEventListener('click', function (event) {
+      var link = event.target.closest && event.target.closest('a[href]');
+      if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ||
+          link.target || link.hasAttribute('download') || link.hasAttribute('data-scroll')) return;
+      var u;
+      try { u = new URL(link.href, location.href); } catch (_) { return; }
+      if (u.origin !== location.origin) return;
+      if (!(u.pathname === '/' || /^\/p\/[^/]+\/?$/.test(u.pathname) ||
+            /^\/(about|delivery|returns|size-guide|privacy)\/?$/.test(u.pathname))) return;
+      event.preventDefault();
+      if (u.href !== location.href) history.pushState({}, '', u.href);
+      route();
+    });
+    window.addEventListener('popstate', route);
     window.addEventListener("hashchange", route);
     route();
   })();
