@@ -71,8 +71,10 @@
     function contactIcon() { return hasWhatsApp() ? icons.whatsapp : icons.messenger; }
     function contactUrl(p) {
       if (hasWhatsApp()) {
-        var msg = p ? orderMessage(p) : "Hello " + shop.name + "! I'd like more information about your products.";
-        return "https://wa.me/" + shop.whatsapp + "?text=" + encodeURIComponent(msg);
+        // General contact opens a blank chat so customers can write ANY enquiry.
+        // Product links alone contain the prefilled product-specific message.
+        if (!p) return "https://wa.me/" + shop.whatsapp;
+        return "https://wa.me/" + shop.whatsapp + "?text=" + encodeURIComponent(orderMessage(p));
       }
       return messengerUrl(p);
     }
@@ -297,6 +299,34 @@
       }).join("") + "</nav>";
     }
 
+    // Flexible search: normalize product names/codes and familiar spellings
+    // while keeping the entire catalogue fully client-side (no user data sent).
+    var searchAliases = {
+      "plazo": "palazzo", "plazos": "palazzo", "plazzo": "palazzo", "palazo": "palazzo",
+      "pallazo": "palazzo", "palazzos": "palazzo", "plazoo": "palazzo",
+      "trouser": "palazzo", "trousers": "palazzo", "pant": "palazzo", "pants": "palazzo",
+      "cotten": "cotton", "cottan": "cotton", "cottons": "cotton",
+      "skrit": "skirt", "skirtz": "skirt", "skirts": "skirt",
+      "grey": "gray", "greys": "gray", "grays": "gray",
+      "maroonish": "maroon", "colours": "color", "colour": "color", "colors": "color",
+      "প্লাজো": "palazzo", "পালাজো": "palazzo", "প্যালাজো": "palazzo",
+      "প্যান্ট": "palazzo", "স্কার্ট": "skirt", "কটন": "cotton", "লিনেন": "linen"
+    };
+    function normalizeSearch(text) {
+      return String(text == null ? "" : text).toLowerCase().normalize("NFKC")
+        .replace(/[^\p{L}\p{M}\p{N}]+/gu, " ").trim().split(/\s+/)
+        .filter(Boolean).map(function (word) { return searchAliases[word] || word; }).join(" ");
+    }
+    function productSearchText(p) {
+      var data = [p.name, p.category, p.id, p.sku, p.description, p.variantColor,
+        p.groupName, p.fabric, p.material, p.tags, p.keywords];
+      if (p.details && typeof p.details === "object") {
+        Object.keys(p.details).forEach(function (key) { data.push(key, p.details[key]); });
+      }
+      return normalizeSearch(data.filter(Boolean).join(" "));
+    }
+    // Build the lightweight search index once, not on every keystroke.
+    var searchIndex = new Map(products.map(function (p) { return [p, productSearchText(p)]; }));
     var searchTerm = "";
     var pageSize = window.matchMedia("(min-width: 760px)").matches ? 20 : 12;
     var visibleLimit = pageSize;
@@ -318,14 +348,27 @@
     function renderGrid(activeCat) {
       var grid = document.getElementById("grid");
       if (!grid) return;
-      var q = searchTerm.trim().toLowerCase();
+      var q = normalizeSearch(searchTerm);
+      var terms = q ? q.split(" ") : [];
       var list = products.filter(function (p) {
         if (activeCat && catOf(p) !== activeCat) return false;
-        if (!q) return true;
-        var hay = [p.name, p.category, p.id, p.description, p.variantColor, p.groupName].concat(
-          p.details && typeof p.details === "object" ? Object.keys(p.details).map(function (k) { return p.details[k]; }) : []
-        ).join(" ").toLowerCase();
-        return q.split(/\s+/).every(function (word) { return hay.indexOf(word) !== -1; });
+        if (!terms.length) return true;
+        var hay = searchIndex.get(p) || "";
+        var compactHay = hay.replace(/\s/g, "");
+        return terms.every(function (term) {
+          return hay.includes(term) || compactHay.includes(term);
+        });
+      });
+      // Prioritize exact codes and relevant product names in search results.
+      if (terms.length) list.sort(function (a, b) {
+        function rank(p) {
+          var id = normalizeSearch(p.id).replace(/\s/g, "");
+          var compactQ = q.replace(/\s/g, "");
+          var name = normalizeSearch(p.name);
+          return (id === compactQ ? 100 : id.includes(compactQ) ? 60 : 0) +
+                 (name === q ? 35 : name.startsWith(q) ? 22 : name.includes(q) ? 12 : 0);
+        }
+        return rank(b) - rank(a);
       });
       var note = document.getElementById("result-note");
       if (note) note.textContent = q ? list.length + (list.length === 1 ? " product" : " products") + " found for “" + searchTerm.trim() + "”" : "";
