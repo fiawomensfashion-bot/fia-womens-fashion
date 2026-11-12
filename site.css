@@ -405,3 +405,24 @@
 
     /* FIA products are shown in their true proportions: no artificial stretching or cropping. */
     .media img, .gallery-main img, .thumb img { object-fit: contain; }
+/* FIA store pages, gallery zoom, share link, mobile-friendly measurements. */
+.brand-logo { max-width: min(180px, 48vw); height: 46px; width: auto; object-fit: contain; }
+.site-footer .footer-links { display:flex; flex-wrap:wrap; gap:.45rem 1.2rem; justify-content:center; margin-block: .4rem 1.2rem; }
+.site-footer .footer-links a { color:var(--text); font-size:.92rem; font-weight:700; }
+.info-page { max-width:960px; padding:1.4rem 0 4rem; }
+.info-page h1 { font-size:clamp(2rem,7vw,3.6rem); margin:1rem 0 1.2rem; }
+.info-page > p, .info-page .information-copy { font-size:1.08rem; line-height:1.85; max-width:76ch; }
+.information-copy { padding:1.35rem; background:var(--card); border:1px solid var(--border); border-radius:18px; }
+.info-contact { margin-top:2rem; }
+.table-scroll { overflow-x:auto; border-radius:15px; border:1px solid var(--border); margin-top:1.1rem; background:var(--card); }
+.size-table { border-collapse:collapse; width:100%; min-width:600px; }
+.size-table th, .size-table td { text-align:left; padding:.8rem .9rem; border-bottom:1px solid var(--border); vertical-align:top; }
+.size-table thead { background:var(--panel); }
+.size-table .size-notes { color:var(--muted); font-size:.88rem; }
+.share-link { margin:.8rem 0; border:0; background:transparent; padding:.5rem 0; text-decoration:underline; color:var(--accent-ink); cursor:pointer; font-weight:800; }
+.zoom-trigger { position:absolute; right:.7rem; bottom:.7rem; border:1px solid var(--border); border-radius:999px; background:rgba(255,255,255,.94); color:var(--text); padding:.45rem .85rem; font-size:.92rem; font-weight:800; cursor:zoom-in; }
+.photo-zoom { max-width:min(98vw,1100px); max-height:98vh; border:none; border-radius:14px; padding:.7rem; background:var(--card); box-shadow:0 20px 80px rgba(0,0,0,.3); }
+.photo-zoom::backdrop { background:rgba(20,15,18,.86); }
+.photo-zoom img { display:block; max-width:100%; max-height:83vh; height:auto; width:auto; margin:auto; object-fit:contain; }
+.photo-zoom .zoom-close { display:block; margin-left:auto; border:0; border-radius:9px; background:var(--panel); color:var(--text); font-size:1rem; padding:.4rem .8rem; cursor:pointer; }
+@media (max-width:420px) { .header-nav a.hide-xs { display:none; } .info-page { padding-bottom:2rem; } .information-copy { padding:1rem; } }
