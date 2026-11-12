@@ -97,10 +97,12 @@ await Promise.all(Array.from({length:workers},async()=>{
   while(next<paths.length) { const i=next++; await processPhoto(paths[i]); }
 }));
 await fs.writeFile(path.join(dist,'image-manifest.js'),
-  '/* Generated FIA responsive images. No visitor tracking. */\nwindow.FIA_IMAGE_MANIFEST = '+JSON.stringify(manifest)+';\n');
+  '/* Generated FIA responsive images and stable public URL. No visitor tracking. */\n' +
+  'window.FIA_PUBLIC_SITE_ORIGIN = '+JSON.stringify(safeOrigin)+';\n' +
+  'window.FIA_IMAGE_MANIFEST = '+JSON.stringify(manifest)+';\n');
 
 const absolute=(suffix)=>safeOrigin+suffix;
-const mainDescription="FIA Women's Fashion linen palazzos, Swiss cotton palazzos and skirts. Browse individual colours and order through Messenger.";
+const mainDescription="FIA Women's Fashion linen palazzos, Swiss cotton palazzos and skirts. Browse individual colours and ask FIA on WhatsApp.";
 const replaceMeta=(html,title,description,imageUrl,url,type='website')=>{
   let out=html;
   out=out.replace(/<title>[\s\S]*?<\/title>/,`<title>${escapeHtml(title)}</title>`);
