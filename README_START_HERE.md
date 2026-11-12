@@ -1,101 +1,84 @@
-# FIA CMS Upgrade — Keep Your Existing Netlify Design
+# FIA Women's Fashion — Complete Catalogue & Store Pages Upgrade
 
-## What this download contains
+**This upgrade was created from the repository ZIP provided on 12 November 2026.**
 
-It supplies an editor configuration (`.pages.yml`), public catalogue data (`data/`), a build script (`scripts/`), and `products.js` in **the exact format used by the index.html you shared**.
+## What's in it
 
-**It does NOT contain your `index.html` or your actual product images. Do NOT deploy this ZIP by itself.** Merge it into a complete backup of your existing website folder before deploying.
+- **97 photographs**, automatically assigned to galleries for **27 linked colour listings** under 3 product designs:
+  - Linen Palazzo: **20 colours / 49 photographs**
+  - Swiss Cotton Palazzo: **4 colours / 28 photographs**
+  - Swiss Cotton Skirt: **3 colours / 20 photographs**
+- Every main colour and each additional colour appears on the product feed and is connected to the others.
+- Product-specific sharable links such as `/p/FIA-SP-01/`, separate HTML social previews and basic structured data.
+- Pages for About FIA, Delivery/COD, Returns/Replacement, Size Guide and Privacy, all editable via Pages CMS.
+- Product image zoom, copy-product-link, smoother Load More and debounced search.
+- Image build only processes images referenced in the product data. Creates 240px and 480px WebP files; the high-resolution original is copied **without recompression** to a versioned URL. Browser caches versioned files for 1 year.
+- Both Cloudflare Pages and Netlify use the same `npm run build` / `dist` configuration.
 
-## What's fixed
+## IMPORTANT: user facts and unfinished business details
 
-- Your current `products.js` contains four unrelated SAMPLE items (kurti, maxi dress, earrings and tote bag). These are not FIA stock and were deliberately not copied into the new catalogue.
-- Outdated sales were replaced with your three FIA offers/assurances.
-- `messengerPage` is currently `fiawomensfashion` because that is in the uploaded file. This username is NOT independently verified. Open https://m.me/fiawomensfashion and confirm it reaches YOUR Page before launching.
-- Product catalogue starts empty, so no imaginary prices, measurements, photos or inventory are published.
-- Your existing `index.html` and its look are retained. No CSS/HTML overhaul is necessary.
+- **Swiss Cotton Palazzo** has a `400` BDT price and a `500` BDT comparison price from the uploaded product data. **Check that the comparison price was actually a real previous selling price** before advertising a discount; if not, remove it in Pages CMS.
+- **Linen Palazzo** and **Swiss Cotton Skirt** have **no verified price in the source**. They appear as **Ask for price** rather than invented values. Set them in Pages CMS before launch if available.
+- Exact measurements, delivery fees, refund/return deadlines, availability for new colours and other binding policy terms were NOT provided. They remain unknown and should be confirmed before a public launch.
+- The **official FIA logo image was not in the uploaded ZIP**. The site shows the existing text mark until you upload your actual logo through Pages CMS > FIA Shop Settings > Official FIA Logo Image. It will then be used as the site logo and favicon.
+- Some filenames are generic generated-image names. Colour assignments were made from visible images and are **proposed**, not proof of actual item colour/stock. Review `docs/REVIEW_COLOUR_MATCHES.csv` against your real products before publishing.
+- **This ZIP's image inventory is a snapshot.** Images added to GitHub after that ZIP was downloaded are NOT in this catalogue automatically. New colours or images need naming / grouping information, or Pages CMS updates.
 
-## BEFORE YOU BEGIN: Backup!
+## EASIEST WAY — update the existing GitHub repository WITHOUT reuploading images
 
-1. In Netlify, open your existing FIA project's latest successful deploy and download its files (or use your original ZIP).
-2. Extract the existing site into a working folder. It should contain `index.html`, `products.js`, and `images/` (if you had images).
-3. Make a second backup folder that will remain untouched.
+1. Download the **FIA_Upgrade_Patch_No_Images.zip** file and extract it. Do NOT upload the ZIP directly to GitHub; GitHub does not automatically unpack archives.
+2. Back up your repository / download ZIP before replacing files.
+3. Use **GitHub Desktop** (simplest for many files) to clone your existing FIA repository. Copy the extracted PATCH CONTENTS into the repository's top-level folder, preserving the nested paths. Commit and push. Alternatively use GitHub Add file > Upload files or edit text files one by one, preserving the folder structure.
+4. Replace/add these exact paths:
+   - `index.html`
+   - `assets/site.css` and `assets/site.js` (old root `site.css` and `site.js` can remain unused)
+   - `scripts/build-catalogue.mjs` and `scripts/build-site.mjs`
+   - `data/products.json`, `data/site-info.json`, `data/sizes.json`
+   - `.pages.yml`, `_headers`, `package.json`, `netlify.toml`, `README_START_HERE.md`
+   - `docs/REVIEW_COLOUR_MATCHES.csv`
+   - `products.js` is a convenience generated file; the build will regenerate it
+5. **Do not delete or change your existing `images/` folder**, `data/offers.json`, `data/settings.json` or your other CMS-generated images.
+6. The patch ZIP includes `data/products.json`, **which is a complete replacement** for the two unfinished records in the supplied ZIP. If you've edited any products AFTER downloading the ZIP, back them up or merge the changes first; do not overwrite newer content blindly.
 
-## Step 1: Merge this upgrade
+## Cloudflare Pages PREVIEW settings
 
-1. Extract this ZIP somewhere else.
-2. Copy the following into your existing site's working folder: `.pages.yml`, `data/`, `scripts/`, `netlify.toml`, and `products.js`. Replace the old `products.js` after backing it up.
-3. Leave your **existing `index.html` unchanged**.
-4. Keep any preexisting `images/` folder and its files. Merge folders; don't delete real images.
-5. The `data/products.json` file is intentionally `[]`. Adding a real product through Pages CMS is next.
+- Framework: None
+- Build command: `npm run build`
+- Build output directory: `dist`
+- Root directory: blank (Git repo root)
+- Node.js: version 20 or higher
 
-## Step 2: Put complete website in GitHub
+Optional environment variable `PUBLIC_SITE_URL` = your Cloudflare preview domain (e.g. `https://YOUR-PROJECT.pages.dev`) for canonical tags, social previews and sitemap. If omitted, the build tries `CF_PAGES_URL` automatically.
 
-Option A: In your EXISTING Netlify project, Project configuration → Developer settings → Continuous deployment → Repository → Push to new repository (if offered). This creates a GitHub repository from current deployed files. **Then upload/merge the upgrade files into that repository**.
+## Netlify settings if you choose FINAL hosting there
 
-Option B: Create a new private GitHub repository, upload your **complete merged website folder** (index.html, products.js, images, data, scripts, .pages.yml, netlify.toml), then link it to your EXISTING Netlify site via Project configuration → Developer settings → Continuous deployment → Repository → Link repository.
+- The included `netlify.toml` defines `npm run build` and publishes `dist`.
+- If your Netlify free account is running low on credits, **stop Netlify production builds while testing**. Deploying the final site and later catalog updates may still consume credits.
+- When final Netlify URL is confirmed, configure environment variable `PUBLIC_SITE_URL` to your exact final public domain, including `https://`, with no trailing slash. In Netlify the build also tries `URL` automatically.
 
-NOTE: Upload a folder's extracted contents. Uploading just this ZIP as one GitHub file will NOT unzip/install it.
+**Recommended:** You can keep Cloudflare Pages for production too. Your Pages CMS → GitHub → Cloudflare automatic update flow works without consuming Netlify production-deployment credits.
 
-## Step 3: Check Netlify's build settings
+## How to check after deployment
 
-For a simple static HTML site, in Netlify verify:
+1. The feed should have **27 listings**: 20 linen, 4 Swiss cotton palazzo and 3 Swiss cotton skirt. 12 shown first on small phones, 20 on desktop.
+2. Click any listing: all colours for that main design should appear linked. Each colour has its own photo gallery.
+3. Click **Zoom**, then Close. Click **Copy link to this colour**; the URL will be `/p/PRODUCT-CODE/`.
+4. Visit `/about/`, `/delivery/`, `/returns/`, `/size-guide/`, and `/privacy/`.
+5. Verify a shared individual product URL shows title + thumbnail in Facebook link preview (requires PUBLIC_SITE_URL and a live public website).
+6. Confirm Messenger orders reach the correct FIA Facebook account and verify wording before telling customers the order is complete.
+7. Open Chrome Developer Tools → Network, tick Disable cache, reload on mobile viewport and check transferred bytes. Check subsequent load with cache enabled. No live traffic benchmark was performed in this local build.
 
-- Build command: `node scripts/build-catalogue.mjs`
-- Publish directory: `.` (project root)
-- Base directory: blank (root)
+## Cache / security / customer data
 
-`netlify.toml` sets the first two automatically if this is the site structure. You should see in your deploy log: `Generated products.js with 0 product(s), 3 offer(s).`
+- `_headers` adds CSP, frame restrictions, content type protections and browser caching for `/assets/*` and `/images/optimized/*`.
+- `products.js`, `image-manifest.js`, and HTML pages are configured to revalidate so price updates are not locked for a year.
+- The website is a static catalogue. It does **not** create visitor accounts, store customer orders, or secretly collect customer phone numbers. Browser image caching is not the same as tracking people.
+- Keep credentials, customer addresses/orders, personal phone numbers and supplier financial records out of the public repository. Enable 2FA on GitHub/hosting.
 
-Your existing Netlify site URL should remain the same if you linked this repository to the existing project. Don't create another Netlify site unless you intend to.
+## Build on your computer
 
-## Step 4: Open the actual free admin dashboard
+Requires Node 20+: run `npm install` then `npm run build`. Open the published output from `dist/` via a local HTTP server, not by double-clicking an HTML file. Sharp is the only third-party build dependency.
 
-1. Visit https://app.pagescms.org/
-2. Sign in with GitHub.
-3. Install/authorize the Pages CMS GitHub App for ONLY your FIA repository if offered.
-4. Open the FIA repository. It should find `.pages.yml` at its root.
-5. You should now see `FIA Products`, `FIA Offers & Guarantees`, and `FIA Shop Settings`.
+## What remains to finish
 
-## Step 5: Add real products
-
-1. Open `FIA Products` and choose to add a new item.
-2. Set a unique code, name, collection, real price, real photos, material, verified size, colours and design details.
-3. Toggle `In Stock` ON **only when you are accepting orders**.
-4. Save/commit.
-5. Pages CMS writes to `data/products.json` and `images/` in GitHub. Netlify then builds a new `products.js` and publishes automatically.
-6. Refresh your existing FIA website and test the category, photo gallery and Messenger button.
-
-## Step 6: Messenger button
-
-Go to `FIA Shop Settings` and set `messengerPage` to ONLY the Page username, e.g. `fiawomensfashion`, NOT the full `https://m.me/` URL. The index.html automatically adds `https://m.me/`. Test the live URL on your phone before promoting.
-
-When a customer clicks Order, the existing code tries to copy the item's name, code and price and opens Messenger. They must paste and send the copied message themselves.
-
-## Step 7: Edit offers / policies
-
-Open `FIA Offers & Guarantees` to edit:
-- Buy any 3 Swiss Cotton Palazzos → 1 Normal Palazzo free
-- Buy 3 Normal Palazzos → free delivery
-- Quality guarantee + free replacement for wrong/defective products, subject to published policy
-
-Be clear about whether the normal palazzo is the linen model, which colours are included, shipping coverage and any offer exclusions. Do not make claims you cannot fulfil.
-
-## Troubleshooting
-
-**The website shows the OLD products:** Make sure you linked the correct GitHub repo to the existing Netlify project, deploy succeeded, and Netlify built the latest commit. Inspect the Netlify deploy log for the build command.
-
-**Pages CMS doesn't see the config:** `.pages.yml` must be at the root of the selected branch. The GitHub App must have repo access.
-
-**Images missing:** Images selected in Pages CMS should be saved under `images/`. Build script removes `/images/` from image values because the original site adds the folder itself. Check names and letter case.
-
-**No products appear:** `data/products.json` starts empty; add a real item with a valid price greater than zero. The builder skips incomplete entries.
-
-**Order opens the wrong Page:** Verify `messengerPage` at https://m.me/YOURUSERNAME.
-
-**Site breaks after linking Git:** Check that `index.html` is at repository root, not inside the upgrade ZIP or a nested folder. Root publish folder `.` assumes this.
-
-**Netlify credit limits:** Free hosting and Pages CMS are subject to their respective plan usage limits. You do NOT need WooCommerce, paid WordPress hosting, or an online payment gateway for this setup.
-
-## Security
-
-Store ONLY public catalogue content in this repository. Do not put customer phone numbers, addresses, orders, supplier costs, passwords, or private data into website files. Protect your GitHub and Netlify accounts using strong authentication.
+Fill real prices for linen/skirt, actual garment measurements, definitive stock status, actual delivery charges, verified offer/return terms, and the official FIA logo image. Don't use an imaginary logo or invented prices in a customer-facing catalogue.

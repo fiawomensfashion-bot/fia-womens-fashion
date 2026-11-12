@@ -21,3 +21,17 @@
   Cache-Control: public, max-age=0, must-revalidate
 /
   Cache-Control: public, max-age=0, must-revalidate
+
+# Shareable product and information pages must revalidate when content changes.
+/p/*
+  Cache-Control: public, max-age=0, must-revalidate
+/about/*
+  Cache-Control: public, max-age=0, must-revalidate
+/delivery/*
+  Cache-Control: public, max-age=0, must-revalidate
+/returns/*
+  Cache-Control: public, max-age=0, must-revalidate
+/privacy/*
+  Cache-Control: public, max-age=0, must-revalidate
+/size-guide/*
+  Cache-Control: public, max-age=0, must-revalidate
