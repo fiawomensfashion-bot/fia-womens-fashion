@@ -45,6 +45,14 @@ content:
         label: Previous Price (optional)
         type: number
         description: Only enter if a genuine previous selling price applies.
+      - name: mainColor
+        label: Main Product Colour (optional)
+        type: string
+        description: If the main listing represents one particular colour, enter its name, e.g. Black. Otherwise leave blank and it will appear as "Main product" in the colour selector.
+      - name: mainHex
+        label: Main Product Swatch HEX (optional)
+        type: string
+        description: Example #292929. Leave blank if the main product is a general overview of all colours.
       - name: variants
         label: Colours and Photo Galleries
         type: object
@@ -93,7 +101,7 @@ content:
             label: Feature This Colour
             type: boolean
       - name: images
-        label: Default Photos (for products with no colour entries)
+        label: Main Product Photos (show on main listing even when colours exist)
         type: image
         options:
           multiple:
