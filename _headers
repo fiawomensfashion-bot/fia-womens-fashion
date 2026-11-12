@@ -1,4 +1,4 @@
-# FIA Cloudflare Pages security headers. Place in dist root during build.
+# FIA Cloudflare Workers static assets / Pages / Netlify headers. Copied into dist by build.
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
@@ -11,27 +11,35 @@
   Cache-Control: public, max-age=31536000, immutable
 /images/optimized/*
   Cache-Control: public, max-age=31536000, immutable
+/products.*.js
+  Cache-Control: public, max-age=31536000, immutable
+/image-manifest.*.js
+  Cache-Control: public, max-age=31536000, immutable
 
-# Catalogue and generated image index always revalidate, so prices and stock stay fresh.
+# HTML and the tiny update-check endpoint must NEVER be stored in the
+# browser cache; the same applies to legacy unversioned JS URLs.
+# Versioned JS above remains cached for a year, without risking stale prices.
 /products.js
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-store
 /image-manifest.js
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-store
+/site-version.json
+  Cache-Control: no-store
 /index.html
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-store
 /
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-store
 
-# Shareable product and information pages must revalidate when content changes.
+# All HTML documents are fresh when visitors revisit or share a product.
 /p/*
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-store
 /about/*
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-store
 /delivery/*
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-store
 /returns/*
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-store
 /privacy/*
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-store
 /size-guide/*
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-store
