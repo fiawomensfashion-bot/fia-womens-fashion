@@ -96,10 +96,32 @@ async function processPhoto(rel) {
 await Promise.all(Array.from({length:workers},async()=>{
   while(next<paths.length) { const i=next++; await processPhoto(paths[i]); }
 }));
-await fs.writeFile(path.join(dist,'image-manifest.js'),
+const manifestSource =
   '/* Generated FIA responsive images and stable public URL. No visitor tracking. */\n' +
   'window.FIA_PUBLIC_SITE_ORIGIN = '+JSON.stringify(safeOrigin)+';\n' +
-  'window.FIA_IMAGE_MANIFEST = '+JSON.stringify(manifest)+';\n');
+  'window.FIA_IMAGE_MANIFEST = '+JSON.stringify(manifest)+';\n';
+await fs.writeFile(path.join(dist,'image-manifest.js'),manifestSource);
+
+// The HTML changes on every catalogue or UI update. Unlike an unversioned
+// products.js, a fingerprinted URL cannot accidentally reuse an old browser copy.
+const productsSource=await fs.readFile(path.join(base,'products.js'));
+const productAsset=`products.${contentHash(productsSource)}.js`;
+const manifestAsset=`image-manifest.${contentHash(Buffer.from(manifestSource))}.js`;
+await fs.writeFile(path.join(dist,productAsset),productsSource);
+await fs.writeFile(path.join(dist,manifestAsset),manifestSource);
+homepage=homepage.replace('src="/products.js"',`src="/${productAsset}"`)
+  .replace('src="/image-manifest.js"',`src="/${manifestAsset}"`);
+
+// A tiny, non-personal status file lets already-open tabs detect fresh stock,
+// prices, colours and buttons without making customers clear their browser cache.
+const versionHash=crypto.createHash('sha256')
+  .update(productsSource).update(manifestSource).update(template)
+  .update(await fs.readFile(path.join(base,'assets/site.css')))
+  .update(await fs.readFile(path.join(base,'assets/site.js')))
+  .digest('hex').slice(0,16);
+await fs.writeFile(path.join(dist,'site-version.json'),JSON.stringify({version:versionHash})+'\n');
+homepage=homepage.replace('</head>',
+  `  <meta name="fia-build-version" content="${versionHash}">\n</head>`);
 
 const absolute=(suffix)=>safeOrigin+suffix;
 const mainDescription="FIA Women's Fashion linen palazzos, Swiss cotton palazzos and skirts. Browse individual colours and ask FIA on WhatsApp.";
