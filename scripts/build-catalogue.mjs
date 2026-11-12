@@ -10,6 +10,8 @@ const read = (file) => JSON.parse(fs.readFileSync(path.join(base, 'data', file),
 const settings = read('settings.json');
 const offers = read('offers.json');
 const records = read('products.json');
+const siteInfo = read('site-info.json');
+const sizeGuide = read('sizes.json');
 if (!Array.isArray(records) || !Array.isArray(offers) || !settings || typeof settings !== 'object' || Array.isArray(settings)) {
   throw new Error('Expected products.json and offers.json to be arrays, and settings.json to be an object.');
 }
@@ -28,7 +30,7 @@ const cleanImage = (image) => {
   return stripped;
 };
 const imageList = (value) => (Array.isArray(value) ? value : value ? [value] : []).map(cleanImage).filter(Boolean);
-const optionalOld = (value, price) => validPrice(value) && Number(value) > price ? Number(value) : null;
+const optionalOld = (value, price) => price !== null && validPrice(value) && Number(value) > price ? Number(value) : null;
 const addProduct = (p) => {
   if (usedIds.has(p.id)) throw new Error(`Duplicate product/colour code: ${p.id}`);
   usedIds.add(p.id);
@@ -57,7 +59,7 @@ for (const parent of records) {
   const mainColour = asText(parent.mainColor) || 'Main product';
   const mainHex = /^#[0-9a-f]{6}$/i.test(asText(parent.mainHex)) ? asText(parent.mainHex) : '';
   const fallbackImages = variants.flatMap(v => imageList(v?.images)).slice(0, 1);
-  if (basePrice !== null) {
+  { // Unpriced items remain visible with 'Ask for price' instead of invented prices.
     const mainDetails = { ...baseDetails };
     if (asText(parent.mainColor)) mainDetails.Colour = asText(parent.mainColor);
     if (!baseImages.length && fallbackImages.length) {
@@ -71,18 +73,16 @@ for (const parent of records) {
       // A non-empty variantColor includes the parent in the existing colour picker.
       variantColor: mainColour,
       variantHex: mainHex,
-      name,
+      name: asText(parent.mainColor) ? `${name} — ${asText(parent.mainColor)}` : name,
       category,
       price: basePrice,
       oldPrice: optionalOld(parent.oldPrice, basePrice),
       images: baseImages.length ? baseImages : fallbackImages,
       description: asText(parent.description),
       details: mainDetails,
-      inStock: parent.inStock === true || (!asText(parent.mainColor) && variants.some(v => v && v.inStock === true)),
+      inStock: parent.inStock === true ? true : parent.inStock === false ? false : null,
       featured: parent.featured === true
     });
-  } else {
-    console.warn(`Skipping main product ${id}: base price must be positive.`);
   }
 
   // Show every additional colour as its own card. All colours and the main
@@ -92,8 +92,8 @@ for (const parent of records) {
     const variantId = asText(v.id);
     const colour = asText(v.color);
     const price = validPrice(v.price) ? Number(v.price) : basePrice;
-    if (!variantId || !colour || price === null) {
-      console.warn(`Skipping colour ${JSON.stringify(colour)} for ${id}: requires unique code, colour and a valid price.`);
+    if (!variantId || !colour) {
+      console.warn(`Skipping colour ${JSON.stringify(colour)} for ${id}: requires unique code and colour.`);
       continue;
     }
     const oldVal = validPrice(v.oldPrice) ? v.oldPrice : parent.oldPrice;
@@ -119,7 +119,7 @@ for (const parent of records) {
       images: colourImages,
       description: asText(v.description) || asText(parent.description),
       details: { ...baseDetails, Colour: colour },
-      inStock: v.inStock === true,
+      inStock: v.inStock === true ? true : v.inStock === false ? false : null,
       featured: v.featured === true
     });
   }
@@ -130,7 +130,10 @@ const output = [
   `const SETTINGS = ${JSON.stringify(settings, null, 2)};`,
   `const OFFERS = ${JSON.stringify(offers, null, 2)};`,
   `const PRODUCTS = ${JSON.stringify(products, null, 2)};`,
+  `const SHOP_INFO = ${JSON.stringify(siteInfo, null, 2)};`,
+  `const SIZE_GUIDE = ${JSON.stringify(sizeGuide, null, 2)};`,
   ''
 ].join('\n');
 fs.writeFileSync(path.join(base, 'products.js'), output, 'utf8');
+fs.writeFileSync(path.join(base, '.fia-generated-products.json'), JSON.stringify(products), 'utf8');
 console.log(`Generated products.js: ${records.length} design(s), ${products.length} displayed colour listing(s), ${offers.length} offer(s).`);
