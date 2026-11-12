@@ -7,6 +7,7 @@
       name: S.shopName || "Fia",
       tagline: S.tagline || "",
       page: S.messengerPage || "",
+      whatsapp: String(S.whatsappNumber || "").replace(/\D/g, ""),
       theme: S.theme || "rose",
       currency: S.currency || "৳",
       footer: S.footerNote || "",
@@ -62,6 +63,45 @@
       var base = "https://m.me/" + encodeURIComponent(shop.page);
       return p ? base + "?ref=" + encodeURIComponent("fia_" + String(p.id).replace(/[^A-Za-z0-9_-]/g, "")) : base;
     }
+    // WhatsApp's official click-to-chat link fills the MESSAGE FIELD with the
+    // exact selected item. It does not send the message; customers tap Send.
+    // Keep Messenger as a fallback until a valid number is configured.
+    function hasWhatsApp() { return /^[1-9]\d{7,14}$/.test(shop.whatsapp); }
+    function contactName() { return hasWhatsApp() ? "WhatsApp" : "Messenger"; }
+    function contactIcon() { return hasWhatsApp() ? icons.whatsapp : icons.messenger; }
+    function contactUrl(p) {
+      if (hasWhatsApp()) {
+        var msg = p ? orderMessage(p) : "Hello " + shop.name + "! I'd like more information about your products.";
+        return "https://wa.me/" + shop.whatsapp + "?text=" + encodeURIComponent(msg);
+      }
+      return messengerUrl(p);
+    }
+    // Share the stable public host, not an ephemeral Workers preview URL.
+    // Set PUBLIC_SITE_URL in hosting build environment for a reliable domain.
+    function publicSiteOrigin() {
+      // Workers preview URLs can differ from the origin injected at build time.
+      // Use the ACTUAL host that served this page, not a stale preview hostname.
+      if (/\.workers\.dev$/i.test(location.hostname)) return location.origin;
+      var fixed = typeof window.FIA_PUBLIC_SITE_ORIGIN === "string" ? window.FIA_PUBLIC_SITE_ORIGIN.trim() : "";
+      try {
+        var url = new URL(fixed);
+        if (url.protocol === "https:" && url.pathname === "/" && !url.search && !url.hash) return url.origin;
+      } catch (_) { /* use current origin if no public domain is configured */ }
+      return location.origin;
+    }
+    // Cloudflare Workers static-asset deployments may not resolve nested HTML
+    // pages. Root/hash links work even there. On Pages/Netlify, preserve proper
+    // shareable product HTML pages with per-product Open Graph metadata.
+    function productPathForHost(p, host) {
+      var code = encodeURIComponent(String(p.id));
+      var hostname;
+      try { hostname = new URL(host).hostname; } catch (_) { hostname = location.hostname; }
+      return /\.workers\.dev$/i.test(hostname) ? "/#/product/" + code : "/p/" + code + "/";
+    }
+    function shareProductUrl(p) {
+      var origin = publicSiteOrigin();
+      return origin + productPathForHost(p, origin);
+    }
     function orderMessage(p) {
       var lines = [
         "Hello " + shop.name + "! I'd like more information about this item.",
@@ -70,7 +110,9 @@
         "Product code: " + p.id
       ];
       if (num(p.price) !== null) lines.push("Listed price: " + money(p.price));
-      lines.push("Product link: " + location.origin + productUrl(p));
+      // The hash route works on both Workers previews and the final Pages/Netlify site,
+      // avoiding 404s for product-specific links shared by WhatsApp.
+      lines.push("Product link: " + publicSiteOrigin() + "/#/product/" + encodeURIComponent(String(p.id)));
       lines.push("Please confirm availability, measurements and delivery charges. Thank you!");
       return lines.join("\n");
     }
@@ -151,6 +193,7 @@
 
     /* ---------- Icons ---------- */
     var icons = {
+      whatsapp: '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8A8.5 8.5 0 0 1 12.5 20a8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 12.5 3H13a8.5 8.5 0 0 1 8 8v.5Z"/></svg>',
       messenger: '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2C6.36 2 2 6.13 2 11.7c0 2.91 1.19 5.44 3.14 7.17.16.14.26.35.27.57l.05 1.78a.8.8 0 0 0 1.12.71l1.98-.87a.8.8 0 0 1 .53-.04c.91.25 1.88.38 2.91.38 5.64 0 10-4.13 10-9.7S17.64 2 12 2Zm6 7.46-2.94 4.66a1.5 1.5 0 0 1-2.17.4l-2.34-1.75a.6.6 0 0 0-.72 0l-3.16 2.4c-.42.32-.97-.18-.69-.63l2.94-4.66a1.5 1.5 0 0 1 2.17-.4l2.34 1.75a.6.6 0 0 0 .72 0l3.16-2.4c.42-.32.97.18.69.63Z"/></svg>',
       search: '<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
       check: '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>',
@@ -172,15 +215,17 @@
         (hasDiscount(p) ? '<span class="old-price"><span class="sr-only">Was </span>' + esc(money(p.oldPrice)) + "</span>" : "") + "</div>";
     }
     function orderButton(p, compact) {
-      var label = unknownStock(p) ? (compact ? "Enquire" : "Ask on Messenger") : compact ? "Order" : "Order on Messenger";
+      var label = unknownStock(p) ? (compact ? "Enquire" : "Ask on " + contactName()) : compact ? "Order" : "Order on " + contactName();
       if (!inStock(p)) {
         return '<button class="btn btn-primary btn-block" type="button" disabled>Sold out</button>';
       }
-      return '<a class="btn btn-primary btn-block js-order" href="' + esc(messengerUrl(p)) + '" target="_blank" rel="noopener"' +
-        ' data-id="' + esc(p.id) + '" aria-label="Order ' + esc(p.name) + ' on Messenger (opens in a new tab)">' +
-        icons.messenger + "<span>" + label + "</span></a>";
+      // A normal wa.me link lets the phone open WhatsApp when supported.
+      // The exact item details are already filled in. No copy/paste required.
+      return '<a class="btn btn-primary btn-block js-order" href="' + esc(contactUrl(p)) + '"' +
+        ' data-id="' + esc(p.id) + '" aria-label="Ask FIA about ' + esc(p.name) + ' on ' + contactName() + '">' +
+        contactIcon() + "<span>" + label + "</span></a>";
     }
-    function productUrl(p) { return "/p/" + encodeURIComponent(p.id) + "/"; }
+    function productUrl(p) { return productPathForHost(p, location.origin); }
     // All colour entries of a design stay linked, even though every colour
     // also has its own card and unique product link in the collection feed.
     function variantsOf(p) {
@@ -294,7 +339,7 @@
       } else grid.innerHTML =
         '<div class="empty" style="grid-column: 1 / -1"><h3>' + (q ? "No matches yet" : "Coming soon") + "</h3><p>" +
         (q ? "Try a different word, or send us a message — we may have it in store." : "New pieces are on their way. Check back soon!") +
-        '</p><a class="btn btn-ghost" href="' + esc(messengerUrl()) + '" target="_blank" rel="noopener">' + icons.messenger + "Ask on Messenger</a></div>";
+        '</p><a class="btn btn-ghost" href="' + esc(contactUrl()) + '">' + contactIcon() + "Ask on " + contactName() + "</a></div>";
       grid.dataset.viewKey = viewKey;
       grid.dataset.count = String(visible.length);
       var area = document.getElementById("load-more-area");
@@ -328,7 +373,7 @@
           (shop.tagline ? '<p class="tagline">' + esc(shop.tagline) + "</p>" : "") +
           '<div class="actions">' +
             '<a class="btn btn-primary" href="#catalogue" data-scroll="catalogue">Browse the collection</a>' +
-            '<a class="btn btn-ghost" href="' + esc(messengerUrl()) + '" target="_blank" rel="noopener">' + icons.messenger + "Message us</a>" +
+            '<a class="btn btn-ghost" href="' + esc(contactUrl()) + '">' + contactIcon() + "Message us</a>" +
           "</div>" +
         "</div></div></section>" +
         offersSection() +
@@ -368,10 +413,13 @@
         (hasDiscount(p) ? '<span class="tag tag-accent">' + percentOff(p) + "% off · You save " + esc(money(num(p.oldPrice) - num(p.price))) + "</span>" : "") +
         '<div><span class="stock' + (inStock(p) ? "" : " out") + '">' + (unknownStock(p) ? "Availability: please confirm" : inStock(p) ? "In stock" : "Sold out") + "</span></div>" +
         colourPicker(p, false) +
-        '<button class="share-link" type="button" data-copy-link="' + esc(productUrl(p)) + '">Copy link to this colour</button>' +
+        '<button class="share-link" type="button" data-copy-product="' + esc(p.id) + '">Copy working link to this colour</button>' +
         (p.description ? '<p class="desc">' + esc(p.description) + "</p>" : '<div class="desc"></div>') +
         '<div class="order-box">' + orderButton(p, false) +
-          (inStock(p) ? '<p class="enquiry-help">Your chosen colour, product code and link are copied automatically. Paste once in Messenger and send.</p>' +
+          (inStock(p) ? (hasWhatsApp()
+            ? '<p class="enquiry-help">WhatsApp opens with this product, colour and code already filled in. Review the message and tap Send.</p>'
+            : '<p class="enquiry-help">Your enquiry is copied when Messenger opens, if your browser allows clipboard access. Paste and send in the chat.</p>' +
+              '<button class="btn btn-ghost btn-block js-copy-enquiry" type="button" data-id="' + esc(p.id) + '">Copy complete enquiry</button>') +
             (navigator.share ? '<button type="button" class="btn btn-ghost btn-block js-share-product" data-id="' + esc(p.id) + '">Share product details using your phone</button>' : '') +
             '<details class="enquiry-preview"><summary>See your ready-made message</summary><p>' + esc(orderMessage(p)).replace(/\n/g, '<br>') + '</p></details>' :
             '<p>This piece is sold out. Ask about restocks using the main Message us link.</p>') +
@@ -420,7 +468,7 @@
       return '<div class="wrap info-page"><nav class="crumbs"><a href="/#/">Home</a> / ' + esc(title) + '</nav><h1>' + esc(title) + '</h1>' +
         '<div class="information-copy">' + esc(message).replace(/\n/g,'<br>') + '</div>' + careButton() + '</div>';
     }
-    function careButton() { return '<p class="info-contact"><a class="btn btn-primary" target="_blank" rel="noopener" href="' + esc(messengerUrl()) + '">Ask FIA on Messenger</a></p>'; }
+    function careButton() { return '<p class="info-contact"><a class="btn btn-primary" href="' + esc(contactUrl()) + '">Ask FIA on ' + contactName() + '</a></p>'; }
     function activeProductId() {
       var hashMatch = /^#\/product\/([^/]+)/.exec(location.hash);
       var pathMatch = /^\/p\/([^/]+)\/?$/.exec(location.pathname);
@@ -522,13 +570,15 @@
       zoomDialog.showModal();
     });
     document.addEventListener('click', function (e) {
-      var btn = e.target.closest && e.target.closest('[data-copy-link]');
+      var btn = e.target.closest && e.target.closest('[data-copy-product]');
       if (!btn) return;
-      var link = location.origin + btn.dataset.copyLink;
+      var product = products.find(function (x) { return String(x.id) === btn.dataset.copyProduct; });
+      if (!product) return;
+      var link = shareProductUrl(product);
       copyNow(link).then(function () { showToast('<span>Product link copied.</span>'); }, function () { showToast('<span>Copy this link: <code>' + esc(link) + '</code></span>', 9000); });
     });
 
-    /* ---------- Messenger enquiry: automatically prepare exact product details ---------- */
+    /* ---------- Order enquiries: WhatsApp prefilled, Messenger clipboard fallback ---------- */
     var toast = document.getElementById("toast");
     var toastTimer;
     function showToast(html, ms) {
@@ -561,14 +611,27 @@
     }
 
     document.addEventListener("click", function (e) {
+      var btn = e.target.closest && e.target.closest(".js-copy-enquiry");
+      if (!btn) return;
+      var product = products.find(function (x) { return String(x.id) === btn.dataset.id; });
+      if (!product) return;
+      var enquiry = orderMessage(product);
+      copyNow(enquiry).then(function () {
+        showToast('<span class="tick">' + icons.check + '</span><span>Enquiry copied. Open FIA in Messenger, paste and send.</span>', 8000);
+      }, function () {
+        showToast('<span>Copy your prepared enquiry:<code>' + esc(enquiry) + '</code></span>', 15000);
+      });
+    });
+
+    document.addEventListener("click", function (e) {
       var link = e.target.closest && e.target.closest(".js-order");
       if (!link) return;
       var p = products.filter(function (x) { return String(x.id) === link.dataset.id; })[0];
       if (!p || !inStock(p)) { e.preventDefault(); return; }
+      // WhatsApp has a native prefilled-message field, no copying necessary.
+      // Keep old clipboard behavior only until FIA configures WhatsApp.
+      if (hasWhatsApp()) return;
       var msg = orderMessage(p);
-      // Messenger does not support reliably prefilled messages. We copy for
-      // the customer before the browser navigates to Messenger; no screenshots
-      // or manual retyping of the colour, SKU or product URL are needed.
       copyNow(msg).then(function () {
         showToast('<span class="tick">' + icons.check + '</span><span>Product, colour and link copied. Paste once in Messenger and send.</span>', 8000);
       }, function () {
@@ -587,10 +650,10 @@
       navigator.share({
         title: p.name + ' — ' + shop.name,
         text: orderMessage(p),
-        url: location.origin + productUrl(p)
+        url: shareProductUrl(p)
       }).catch(function (error) {
         if (error && error.name !== 'AbortError')
-          showToast('<span>Sharing is unavailable. Use the Messenger button instead.</span>');
+          showToast('<span>Sharing is unavailable. Use the order button instead.</span>');
       });
     });
 
@@ -613,14 +676,16 @@
       var favicon = document.querySelector('link[rel="icon"]');
       if (favicon) favicon.href = shop.logo;
     }
-    document.getElementById("header-msg").href = messengerUrl();
+    document.getElementById("header-msg").href = contactUrl();
+    document.getElementById("header-msg").removeAttribute("target");
+    document.getElementById("header-msg").textContent = hasWhatsApp() ? "WhatsApp us" : "Message us";
     document.getElementById("footer").innerHTML =
       '<a class="logo" href="/#/">' + esc(shop.name) + '<span class="dot">.</span></a>' +
       (shop.footer ? "<p>" + esc(shop.footer) + "</p>" : "") +
       '<nav class="footer-links" aria-label="Shop information">' +
       '<a href="/about/">About FIA</a><a href="/delivery/">Delivery</a><a href="/returns/">Returns & Replacements</a>' +
       '<a href="/size-guide/">Size Guide</a><a href="/privacy/">Privacy</a></nav>' +
-      '<a class="btn btn-ghost" href="' + esc(messengerUrl()) + '" target="_blank" rel="noopener">' + icons.messenger + "Chat with us on Messenger</a>" +
+      '<a class="btn btn-ghost" href="' + esc(contactUrl()) + '">' + contactIcon() + "Chat with us on " + contactName() + "</a>" +
       "<small>© " + new Date().getFullYear() + " " + esc(shop.name) + ". All prices in Bangladeshi Taka (" + esc(shop.currency) + ").</small>";
 
     if (!activeOffers().length) {
