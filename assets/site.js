@@ -56,9 +56,23 @@
     function inStock(p) { return p.inStock !== false; }
     function unknownStock(p) { return p.inStock !== true && p.inStock !== false; }
     function firstLetter(name) { var s = String(name || "?").trim(); return (Array.from(s)[0] || "?").toUpperCase(); }
-    function messengerUrl() { return "https://m.me/" + encodeURIComponent(shop.page); }
+    // A Messenger referral can identify the exact product to a CONNECTED Messenger
+    // chatbot/inbox integration. It cannot prefill or send the customer's message.
+    function messengerUrl(p) {
+      var base = "https://m.me/" + encodeURIComponent(shop.page);
+      return p ? base + "?ref=" + encodeURIComponent("fia_" + String(p.id).replace(/[^A-Za-z0-9_-]/g, "")) : base;
+    }
     function orderMessage(p) {
-      return "Hi " + shop.name + ", I am interested in " + p.name + " (Code " + p.id + ")" + (num(p.price) !== null ? ", listed at " + money(p.price) : "") + ". Please confirm the price, measurements, availability and delivery charge.";
+      var lines = [
+        "Hello " + shop.name + "! I'd like more information about this item.",
+        "Product: " + p.name,
+        "Colour: " + (p.variantColor || "Please confirm"),
+        "Product code: " + p.id
+      ];
+      if (num(p.price) !== null) lines.push("Listed price: " + money(p.price));
+      lines.push("Product link: " + location.origin + productUrl(p));
+      lines.push("Please confirm availability, measurements and delivery charges. Thank you!");
+      return lines.join("\n");
     }
     function imagesOf(p) { return Array.isArray(p.images) ? p.images.filter(Boolean) : []; }
 
@@ -66,8 +80,10 @@
     // on desktop. The manifest is generated for every Pages CMS upload at build time.
     var imageManifest = (window.FIA_IMAGE_MANIFEST && typeof window.FIA_IMAGE_MANIFEST === "object") ? window.FIA_IMAGE_MANIFEST : {};
     function imageKey(file) { return String(file || "").replace(/^\/?images\//, "").replace(/^\/+/, ""); }
-    function imagePath(file) { return "images/" + imageKey(file).split("/").map(encodeURIComponent).join("/"); }
-    function optimizedPath(file) { return String(file).split("/").map(encodeURIComponent).join("/"); }
+    // ALWAYS use root-relative paths. Relative URLs like 'images/...' break on
+    // /p/PRODUCT-CODE/ because the browser requests /p/PRODUCT-CODE/images/...
+    function imagePath(file) { return "/images/" + imageKey(file).split("/").map(encodeURIComponent).join("/"); }
+    function optimizedPath(file) { return "/" + String(file || "").replace(/^\/+/, "").split("/").map(encodeURIComponent).join("/"); }
     function imgTag(file, p, w, opts) {
       opts = opts || {};
       var versions = imageManifest[imageKey(file)] || [];
@@ -77,7 +93,8 @@
       var srcset = versions.length ? ' srcset="' + esc(versions.map(function (v) {
         return optimizedPath(v.src) + " " + v.w + "w";
       }).join(", ")) + '" sizes="' + esc(opts.sizes || "100vw") + '"' : "";
-      var fallback = versions.length ? optimizedPath(versions[0].src) : imagePath(file);
+      // The real original is the reliable fallback and the best source for zoom.
+      var fallback = imagePath(file);
       return '<img src="' + esc(src) + '"' + srcset +
         ' data-original="' + esc(fallback) + '" data-letter="' + esc(firstLetter(p.name)) + '"' +
         ' alt="' + esc(opts.alt != null ? opts.alt : p.name) + '"' +
@@ -159,7 +176,7 @@
       if (!inStock(p)) {
         return '<button class="btn btn-primary btn-block" type="button" disabled>Sold out</button>';
       }
-      return '<a class="btn btn-primary btn-block js-order" href="' + esc(messengerUrl()) + '" target="_blank" rel="noopener"' +
+      return '<a class="btn btn-primary btn-block js-order" href="' + esc(messengerUrl(p)) + '" target="_blank" rel="noopener"' +
         ' data-id="' + esc(p.id) + '" aria-label="Order ' + esc(p.name) + ' on Messenger (opens in a new tab)">' +
         icons.messenger + "<span>" + label + "</span></a>";
     }
@@ -354,7 +371,10 @@
         '<button class="share-link" type="button" data-copy-link="' + esc(productUrl(p)) + '">Copy link to this colour</button>' +
         (p.description ? '<p class="desc">' + esc(p.description) + "</p>" : '<div class="desc"></div>') +
         '<div class="order-box">' + orderButton(p, false) +
-          "<p>" + (inStock(p) ? "Open Messenger — your enquiry is copied, ready to paste." : "This piece is sold out. Message us to ask about restocks.") + "</p>" +
+          (inStock(p) ? '<p class="enquiry-help">Your chosen colour, product code and link are copied automatically. Paste once in Messenger and send.</p>' +
+            (navigator.share ? '<button type="button" class="btn btn-ghost btn-block js-share-product" data-id="' + esc(p.id) + '">Share product details using your phone</button>' : '') +
+            '<details class="enquiry-preview"><summary>See your ready-made message</summary><p>' + esc(orderMessage(p)).replace(/\n/g, '<br>') + '</p></details>' :
+            '<p>This piece is sold out. Ask about restocks using the main Message us link.</p>') +
         "</div>" +
         (details.length ? '<div class="details"><h2>Details</h2><dl>' + details.map(function (k) {
           return '<div class="row"><dt>' + esc(k) + "</dt><dd>" + esc(p.details[k]) + "</dd></div>";
@@ -494,7 +514,8 @@
       var product = products.find(function (x) { return x.id === activeProductId(); });
       var photo = document.querySelector('#gallery-main img');
       if (!product || !photo || !zoomDialog || !zoomDialog.showModal) return;
-      var source = photo.currentSrc || photo.src;
+      // Open the genuine full-size original, not a small srcset thumbnail.
+      var source = photo.dataset.original || photo.currentSrc || photo.src;
       var zoomImg = document.getElementById('zoom-image');
       zoomImg.src = source;
       zoomImg.alt = photo.alt || product.name;
@@ -507,7 +528,7 @@
       copyNow(link).then(function () { showToast('<span>Product link copied.</span>'); }, function () { showToast('<span>Copy this link: <code>' + esc(link) + '</code></span>', 9000); });
     });
 
-    /* ---------- Order on Messenger: copy message + open m.me ---------- */
+    /* ---------- Messenger enquiry: automatically prepare exact product details ---------- */
     var toast = document.getElementById("toast");
     var toastTimer;
     function showToast(html, ms) {
@@ -545,11 +566,31 @@
       var p = products.filter(function (x) { return String(x.id) === link.dataset.id; })[0];
       if (!p || !inStock(p)) { e.preventDefault(); return; }
       var msg = orderMessage(p);
-      // The link itself opens Messenger in a new tab; we only copy the message here.
+      // Messenger does not support reliably prefilled messages. We copy for
+      // the customer before the browser navigates to Messenger; no screenshots
+      // or manual retyping of the colour, SKU or product URL are needed.
       copyNow(msg).then(function () {
-        showToast('<span class="tick">' + icons.check + "</span><span>Order message copied. Paste it into Messenger and send.</span>");
+        showToast('<span class="tick">' + icons.check + '</span><span>Product, colour and link copied. Paste once in Messenger and send.</span>', 8000);
       }, function () {
-        showToast('<span class="tick">' + icons.check + "</span><span>Copy this message and paste it into Messenger:<code>" + esc(msg) + "</code></span>", 12000);
+        showToast('<span>Copy your enquiry, then paste it into Messenger:<code>' + esc(msg) + '</code></span>', 15000);
+      });
+    });
+
+    // When supported, the mobile operating system's native share sheet can
+    // send the prepared product text/link to a conversation the user chooses.
+    // Do not claim this automatically selects FIA or sends the message.
+    document.addEventListener("click", function (e) {
+      var btn = e.target.closest && e.target.closest('.js-share-product');
+      if (!btn || !navigator.share) return;
+      var p = products.filter(function (x) { return String(x.id) === btn.dataset.id; })[0];
+      if (!p) return;
+      navigator.share({
+        title: p.name + ' — ' + shop.name,
+        text: orderMessage(p),
+        url: location.origin + productUrl(p)
+      }).catch(function (error) {
+        if (error && error.name !== 'AbortError')
+          showToast('<span>Sharing is unavailable. Use the Messenger button instead.</span>');
       });
     });
 
