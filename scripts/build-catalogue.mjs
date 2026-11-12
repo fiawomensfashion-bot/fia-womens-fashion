@@ -1,7 +1,7 @@
 // FIA Catalogue Builder — colour-variant edition.
 // Pages CMS edits data/*.json. Netlify runs this command before publishing.
-// New products can contain a `variants` list; each variant becomes an individual
-// catalogue card while retaining a shared group for colour switching.
+// Every main product becomes a card, even when it has colours. Each colour also
+// becomes its own card and all cards share a group for colour switching.
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -52,56 +52,75 @@ for (const parent of records) {
   }
   const variants = Array.isArray(parent.variants) ? parent.variants : [];
 
-  if (variants.length) {
-    for (const v of variants) {
-      if (!v || typeof v !== 'object') continue;
-      const variantId = asText(v.id);
-      const colour = asText(v.color);
-      const price = validPrice(v.price) ? Number(v.price) : basePrice;
-      if (!variantId || !colour || price === null) {
-        console.warn(`Skipping colour ${JSON.stringify(colour)} for ${id}: requires unique code, colour and a valid price.`);
-        continue;
-      }
-      const oldVal = validPrice(v.oldPrice) ? v.oldPrice : parent.oldPrice;
-      const swatch = /^#[0-9a-f]{6}$/i.test(asText(v.hex)) ? asText(v.hex) : '';
-      addProduct({
-        id: variantId,
-        groupId: id,
-        groupName: name,
-        variantColor: colour,
-        variantHex: swatch,
-        name: `${name} — ${colour}`,
-        category,
-        price,
-        oldPrice: optionalOld(oldVal, price),
-        images: imageList(v.images).length ? imageList(v.images) : baseImages,
-        description: asText(v.description) || asText(parent.description),
-        details: { ...baseDetails, Colour: colour },
-        inStock: v.inStock === true,
-        featured: v.featured === true || parent.featured === true
-      });
+  // Always show the main product in the shop feed. Before this fix, the
+  // main product disappeared as soon as a colour was added to `variants`.
+  const mainColour = asText(parent.mainColor) || 'Main product';
+  const mainHex = /^#[0-9a-f]{6}$/i.test(asText(parent.mainHex)) ? asText(parent.mainHex) : '';
+  const fallbackImages = variants.flatMap(v => imageList(v?.images)).slice(0, 1);
+  if (basePrice !== null) {
+    const mainDetails = { ...baseDetails };
+    if (asText(parent.mainColor)) mainDetails.Colour = asText(parent.mainColor);
+    if (!baseImages.length && fallbackImages.length) {
+      console.warn(`Main product ${id} has no main photos; displaying the first colour photo as a preview. Upload Main Product Photos to replace it.`);
     }
-  } else {
-    // Compatibility with existing Pages CMS entries that have no colours yet.
-    if (basePrice === null) {
-      console.warn(`Skipping product ${id}: price must be positive.`);
-      continue;
-    }
-    const details = { ...baseDetails };
-    if (asText(parent.colours)) details.Colours = asText(parent.colours);
     addProduct({
-      id, name, category,
+      id,
       groupId: id,
       groupName: name,
-      variantColor: '',
-      variantHex: '',
+      isMainProduct: true,
+      // A non-empty variantColor includes the parent in the existing colour picker.
+      variantColor: mainColour,
+      variantHex: mainHex,
+      name,
+      category,
       price: basePrice,
       oldPrice: optionalOld(parent.oldPrice, basePrice),
-      images: baseImages,
+      images: baseImages.length ? baseImages : fallbackImages,
       description: asText(parent.description),
-      details,
-      inStock: parent.inStock === true,
+      details: mainDetails,
+      inStock: parent.inStock === true || (!asText(parent.mainColor) && variants.some(v => v && v.inStock === true)),
       featured: parent.featured === true
+    });
+  } else {
+    console.warn(`Skipping main product ${id}: base price must be positive.`);
+  }
+
+  // Show every additional colour as its own card. All colours and the main
+  // listing are joined by groupId, so visitors can switch in either direction.
+  for (const v of variants) {
+    if (!v || typeof v !== 'object') continue;
+    const variantId = asText(v.id);
+    const colour = asText(v.color);
+    const price = validPrice(v.price) ? Number(v.price) : basePrice;
+    if (!variantId || !colour || price === null) {
+      console.warn(`Skipping colour ${JSON.stringify(colour)} for ${id}: requires unique code, colour and a valid price.`);
+      continue;
+    }
+    const oldVal = validPrice(v.oldPrice) ? v.oldPrice : parent.oldPrice;
+    const swatch = /^#[0-9a-f]{6}$/i.test(asText(v.hex)) ? asText(v.hex) : '';
+    const colourImages = imageList(v.images);
+    if (!colourImages.length) console.warn(`Colour ${variantId} has no photos. Upload photos for this colour so its gallery is accurate.`);
+    if (variantId === id) throw new Error(`Colour code ${variantId} must differ from its main product code.`);
+    if (asText(parent.mainColor).toLowerCase() === colour.toLowerCase() && asText(parent.mainColor)) {
+      console.warn(`Main product ${id} and additional colour ${variantId} are both labeled ${colour}; consider removing the duplicate colour entry.`);
+    }
+    addProduct({
+      id: variantId,
+      groupId: id,
+      groupName: name,
+      isMainProduct: false,
+      variantColor: colour,
+      variantHex: swatch,
+      name: `${name} — ${colour}`,
+      category,
+      price,
+      oldPrice: optionalOld(oldVal, price),
+      // Do NOT reuse the main colour's photos if this colour has no gallery.
+      images: colourImages,
+      description: asText(v.description) || asText(parent.description),
+      details: { ...baseDetails, Colour: colour },
+      inStock: v.inStock === true,
+      featured: v.featured === true
     });
   }
 }
