@@ -175,6 +175,10 @@ content:
         label: Facebook Page Username (NOT the entire URL)
         type: string
         description: Verify the username by opening https://m.me/USERNAME.
+      - name: whatsappNumber
+        label: FIA WhatsApp Business Number
+        type: string
+        description: Enter your WhatsApp number with country code. Example 88017XXXXXXXX. No + sign or spaces.
       - name: theme
         label: Website Colour Theme
         type: select
