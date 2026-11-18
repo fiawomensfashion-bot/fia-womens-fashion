@@ -152,6 +152,76 @@
         "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
         "inStock": true,
         "featured": false
+      },
+      {
+        "id": "FIA-LP-01-PNK",
+        "color": "Hot Pink",
+        "hex": "#FF69B4 ",
+        "images": [
+          "/images/Linen Plazo/Sunlit Minimalist Pink Pants Portrait-compresso.webp",
+          "/images/Linen Plazo/pink_palazzo_waist_closeup-compresso.webp",
+          "/images/Linen Plazo/pink_palazzo_actual_linen_texture-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_5jjln75jjln75jjl_clean-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "inStock": true,
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-LBLU",
+        "color": "Light Blue",
+        "hex": "#ADD8E6",
+        "images": [
+          "/images/Linen Plazo/Sunlit Casual Style on a Wooden Bench-compresso.webp",
+          "/images/Linen Plazo/Turquoise Gathered Waistband Detail-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_3bsbog3bsbog3bsb_clean-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_oew2zboew2zboew2_clean-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "inStock": true,
+        "featured": false
+      },
+      {
+        "id": "FIA-LP-01-NBLU",
+        "color": "Navy Blue",
+        "hex": "#000080",
+        "images": [
+          "/images/Linen Plazo/Gemini_Generated_Image_co1t3aco1t3aco1t_clean-compresso.webp",
+          "/images/Linen Plazo/blue_fabric_closeup-compresso.webp",
+          "/images/Linen Plazo/Cobalt Blue Waistband and Fabric Texture-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_i183pti183pti183_clean-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "inStock": true,
+        "featured": false
+      },
+      {
+        "id": "FIA-SCP-MAV",
+        "color": "Mauve",
+        "hex": "#E0B0FF",
+        "images": [
+          "/images/Linen Plazo/Casual Palazzo Style by Sunlight-compresso.webp",
+          "/images/Linen Plazo/Gemini_Generated_Image_4vr9jv4vr9jv4vr9_clean-compresso.webp",
+          "/images/Linen Plazo/pink_palazzo_waist_closeup_from_jpg-compresso.webp",
+          "/images/Linen Plazo/pink_palazzo_fabric_closeup-compresso.webp",
+          "/images/Linen Plazo/Mauve Linen Palazzo Fashion Poster_clean-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "inStock": true,
+        "featured": false
+      },
+      {
+        "id": "FIA-SCP-TEL",
+        "color": "Teal",
+        "hex": "#008080",
+        "images": [
+          "/images/Linen Plazo/Teal Linen Palazzo Fashion Poster_clean-compresso.webp",
+          "/images/Linen Plazo/Teal Gathered Waistband Close-Up-1-compresso.webp",
+          "/images/Linen Plazo/Turquoise Ruched Fabric Texture Close-Up-2-compresso.webp"
+        ],
+        "description": "Everyday linen palazzo styling with an easy, flowing silhouette. Explore the individual colour photographs, and message FIA for the current price, exact measurements and availability. The photographs show the selected colour; lighting may affect how a shade appears on screen.",
+        "inStock": true,
+        "featured": false
       }
     ],
     "images": [
