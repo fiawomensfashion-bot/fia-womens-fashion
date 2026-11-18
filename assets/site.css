@@ -449,3 +449,11 @@
 .fia-update-notice button.fia-update-dismiss{background:#f2e7ea;color:#442734}
 .fia-update-notice button:focus-visible{outline:3px solid #713246;outline-offset:2px}
 @media (max-width:540px){.fia-update-notice{gap:8px}.fia-update-notice span{flex-basis:100%}}
+
+/* Two contact channels (WhatsApp + Messenger) */
+.order-btns { display: grid; gap: .5rem; }
+.header-nav a.msg-alt { background: transparent; color: var(--accent-ink); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.header-nav a.msg-alt:hover { background: var(--panel); }
+.info-contact, .footer-contacts, .contact-row { display: flex; flex-wrap: wrap; gap: .6rem; }
+.header-nav a.msg { white-space: nowrap; }
+@media (max-width:420px) { .header-nav a.msg { padding: .45rem .7rem; font-size: .92rem; } .logo { font-size: 1.6rem; } }
